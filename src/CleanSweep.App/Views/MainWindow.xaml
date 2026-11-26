@@ -250,7 +250,7 @@
                                 <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE90F;" FontSize="22" Foreground="#A78BFA" Margin="0,0,12,0" VerticalAlignment="Center"/>
                                 <StackPanel>
                                     <TextBlock Text="Windows Araçları" FontSize="14.5" FontWeight="Bold"/>
-                                    <TextBlock Text="Sistem Geri Yükleme, Disk Temizleme, Görev Yöneticisi vb. 15 araç." FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                    <TextBlock Text="Sistem Geri Yükleme, Disk Yönetimi, Görev Yöneticisi vb. 30 araç." FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"/>
                                 </StackPanel>
                             </StackPanel>
                         </Button>
@@ -280,12 +280,11 @@
                     </StackPanel>
                 </DockPanel>
 
-                <!-- Filter Chips (Visible in Expert Mode, optional in Easy Mode) -->
-                <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,10"
-                            Visibility="{Binding IsExpertMode, Converter={StaticResource BoolToVis}}">
+                <!-- Filter Chips (Always visible so anyone can switch between Win32 & Windows Store Apps!) -->
+                <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,10">
                     <RadioButton Content="Tümü" Style="{StaticResource FilterChip}" IsChecked="True" Tag="All" Checked="SourceFilter_Checked"/>
-                    <RadioButton Content="Win32 / MSI" Style="{StaticResource FilterChip}" Tag="Win32" Checked="SourceFilter_Checked"/>
-                    <RadioButton Content="MSIX / Store" Style="{StaticResource FilterChip}" Tag="Msix" Checked="SourceFilter_Checked"/>
+                    <RadioButton Content="Programlar (Win32)" Style="{StaticResource FilterChip}" Tag="Win32" Checked="SourceFilter_Checked"/>
+                    <RadioButton Content="Windows Uygulamaları (Store)" Style="{StaticResource FilterChip}" Tag="Msix" Checked="SourceFilter_Checked"/>
                     <RadioButton Content="Scoop" Style="{StaticResource FilterChip}" Tag="Scoop" Checked="SourceFilter_Checked"/>
                     <RadioButton Content="Chocolatey" Style="{StaticResource FilterChip}" Tag="Chocolatey" Checked="SourceFilter_Checked"/>
                 </StackPanel>
@@ -521,14 +520,22 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="0" Text="Windows Sistem Araçları" FontSize="20" FontWeight="Bold"/>
+                <DockPanel Grid.Row="0" LastChildFill="False">
+                    <TextBlock Text="Windows Sistem Araçları (30 Araç)" FontSize="20" FontWeight="Bold" DockPanel.Dock="Left" VerticalAlignment="Center"/>
+                    <Grid Width="300" DockPanel.Dock="Right">
+                        <TextBox x:Name="ToolsSearchBox" Text="{Binding ToolsSearchQuery, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="Araç ara (ör. disk, güvenlik, ram)..." IsHitTestVisible="False" VerticalAlignment="Center" Margin="14,0,0,0"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   Visibility="{Binding Text.IsEmpty, ElementName=ToolsSearchBox, Converter={StaticResource BoolToVis}}"/>
+                    </Grid>
+                </DockPanel>
                 <Border Grid.Row="1" Background="{StaticResource BgCardBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="10" Padding="14" Margin="0,10,0,12">
-                    <TextBlock Text="Windows'un içinde bulunan ancak bulması zor olan faydalı bakım, temizlik ve onarım araçlarına tek tıkla ulaşın."
+                    <TextBlock Text="Windows'un içinde bulunan ancak bulması zor olan faydalı bakım, disk, ağ, güvenlik ve teşhis araçlarına tek tıkla ulaşın."
                                Foreground="{StaticResource TextSecondaryBrush}"/>
                 </Border>
 
                 <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
-                    <ItemsControl ItemsSource="{Binding WindowsTools}">
+                    <ItemsControl ItemsSource="{Binding FilteredWindowsTools}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <UniformGrid Columns="3"/>

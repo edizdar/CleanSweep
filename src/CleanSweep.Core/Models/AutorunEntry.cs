@@ -8,8 +8,13 @@ public enum AutorunScope
     HkcuRun,
     HklmRun,
     HklmWow64Run,
+    HkcuRunOnce,
+    HklmRunOnce,
+    PoliciesRun,
     UserStartupFolder,
-    CommonStartupFolder
+    CommonStartupFolder,
+    MsixStartupTask,
+    ScheduledTask
 }
 
 public sealed class AutorunEntry : INotifyPropertyChanged
@@ -26,6 +31,7 @@ public sealed class AutorunEntry : INotifyPropertyChanged
     public AutorunScope Scope { get; init; }
     public string RegistryPath { get; init; } = string.Empty;
     public string FilePath { get; init; } = string.Empty;
+    public string TaskSubKeyOrPath { get; init; } = string.Empty;
 
     public bool IsEnabled
     {

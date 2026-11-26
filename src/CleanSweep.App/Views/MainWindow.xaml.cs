@@ -81,7 +81,7 @@ public partial class MainWindow : Window
         else if (NavAutorun.IsChecked == true && !_autorunLoaded)
         {
             _autorunLoaded = true;
-            _vm.RefreshAutorun();
+            await _vm.RefreshAutorunAsync();
         }
         else if (NavMonitor.IsChecked == true || NavQuarantine.IsChecked == true || NavRules.IsChecked == true)
         {
@@ -403,7 +403,7 @@ public partial class MainWindow : Window
     }
 
     // Autorun
-    private void RefreshAutorun_Click(object sender, RoutedEventArgs e) => _vm.RefreshAutorun();
+    private async void RefreshAutorun_Click(object sender, RoutedEventArgs e) => await _vm.RefreshAutorunAsync();
 
     private void AutorunSwitch_Click(object sender, RoutedEventArgs e)
     {
@@ -440,7 +440,7 @@ public partial class MainWindow : Window
             : $"'{entry.Name}' açılışta çalıştırılmayacak şekilde kapatıldı.";
     }
 
-    private void DeleteAutorun_Click(object sender, RoutedEventArgs e)
+    private async void DeleteAutorun_Click(object sender, RoutedEventArgs e)
     {
         if (AutorunGrid.SelectedItem is not AutorunEntry entry) return;
         if (MessageBox.Show($"'{entry.Name}' başlangıç kaydı kalıcı olarak silinsin mi?", "Onay", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes)
@@ -449,7 +449,7 @@ public partial class MainWindow : Window
         bool ok = _vm.AutorunService.DeleteEntry(entry);
         if (!ok)
             MessageBox.Show("Kayıt silinemedi (yönetici yetkisi gerekebilir).", "Başlangıç Yöneticisi", MessageBoxButton.OK, MessageBoxImage.Warning);
-        _vm.RefreshAutorun();
+        await _vm.RefreshAutorunAsync();
     }
 
     private void OpenAutorunLocation_Click(object sender, RoutedEventArgs e)
@@ -747,6 +747,7 @@ public partial class MainWindow : Window
         await RenderAsync("02-program-kaldir.png");
 
         NavAutorun.IsChecked = true;
+        await _vm.RefreshAutorunAsync();
         await RenderAsync("03-acilis-programlari.png");
 
         NavJunk.IsChecked = true;

@@ -2,6 +2,19 @@
 
 Bu dosya CleanSweep projesinin her sürümünde yapılan değişiklikleri ve neden güncellendiğini belgelemek için tutulur. GitHub'da oluşturulan her yeni Release notu bu dosyadaki ilgili sürüm başlığından otomatik alınır.
 
+## [0.4.0] - 2026-11-26
+
+### Neden Güncellendi?
+Kullanıcı geri bildirimleri doğrultusunda Windows Mağaza/sistem uygulamalarının tamamının listelenmesi, tüm başlangıç kaynaklarının (Windows uygulamaları ve zamanlanmış görevler dahil) görünmesi ve Windows Araçları bölümünün kapsamlı hale getirilmesi sağlandı.
+
+### Yeni Özellikler
+- **Tüm Windows Uygulamaları (Store & Sistem Uygulamaları)**: `AppxProvider` filtresi genişletildi (`IsFramework` ve `IsResourcePackage` dışındaki tüm ~93 Windows/Store uygulaması artık listeleniyor) ve `AppxManifest.xml` üzerinden okunabilir adlar çözümlendi.
+- **Her Modda Görünür Kaynak Filtreleri**: `Program Kaldır` sekmesindeki `Tümü`, `Programlar (Win32)`, `Windows Uygulamaları (Store)`, `Scoop` ve `Chocolatey` filtre butonları Kolay Mod'da da görünür hale getirildi.
+- **Kapsamlı Açılış Programları (Autorun) Taraması**: Mevcut `Run` ve `Başlangıç Klasörü` öğelerine ek olarak `RunOnce`, `Policies\Explorer\Run`, **MSIX / Windows Store Başlangıç Görevleri (`AppModel\SystemAppData`)** ve **Oturum Açma / Önyükleme Zamanlanmış Görevleri (`LogonTrigger`/`BootTrigger`)** eklendi; tamamı tek tıkla Aç/Kapa anahtarıyla yönetilebiliyor.
+- **30 Windows Sistem Aracı + Anlık Arama**: `Windows Araçları` bölümü 15'ten **30 yerleşik Windows aracına** çıkarıldı (*Disk Yönetimi, Olay Görüntüleyici, Güvenilirlik Geçmişi, Gelişmiş Güvenlik Duvarı, msconfig, dxdiag, Ortam Değişkenleri, Bellek Tanılama, Güç Seçenekleri, CMD, PowerShell* vb.) ve üstüne anlık arama kutusu eklendi.
+
+---
+
 ## [0.3.0] - 2026-11-26
 
 ### Neden Güncellendi?

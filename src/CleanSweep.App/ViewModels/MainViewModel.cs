@@ -31,6 +31,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
     private List<AppDisplayItem> _allAppItems = [];
     private List<InstalledApp> _allApps = [];
     private string _searchQuery = string.Empty;
+    private string _toolsSearchQuery = string.Empty;
     private AppSource? _sourceFilter;
     private bool _isBusy;
     private bool _isExpertMode;
@@ -51,6 +52,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
     public ObservableCollection<JunkCategory> JunkCategories { get; } = [];
     public ObservableCollection<string> ShredTargets { get; } = [];
     public ObservableCollection<WindowsToolItem> WindowsTools { get; } = new(WindowsToolsCatalog.GetAll());
+    public ObservableCollection<WindowsToolItem> FilteredWindowsTools { get; } = new(WindowsToolsCatalog.GetAll());
     public ObservableCollection<QuarantineSession> QuarantineSessions { get; } = [];
     public ObservableCollection<string> SelectedQuarantineDetails { get; } = [];
     public ObservableCollection<InstallTrace> SavedTraces { get; } = [];
@@ -91,6 +93,18 @@ public sealed class MainViewModel : INotifyPropertyChanged
             _searchQuery = value;
             OnPropertyChanged();
             ApplyFilter();
+        }
+    }
+
+    public string ToolsSearchQuery
+    {
+        get => _toolsSearchQuery;
+        set
+        {
+            if (_toolsSearchQuery == value) return;
+            _toolsSearchQuery = value;
+            OnPropertyChanged();
+            ApplyToolsFilter();
         }
     }
 
@@ -251,13 +265,37 @@ public sealed class MainViewModel : INotifyPropertyChanged
         }
     }
 
-    public void RefreshAutorun()
+    public async Task RefreshAutorunAsync()
     {
-        var list = _autorunService.GetEntries();
-        AutorunEntries.Clear();
-        foreach (var item in list) AutorunEntries.Add(item);
-        OnPropertyChanged(nameof(ActiveAutorunCountText));
-        StatusMessage = $"{list.Count} başlangıç programı listelendi.";
+        IsBusy = true;
+        StatusMessage = "Tüm başlangıç programları ve görevleri taranıyor...";
+        try
+        {
+            var list = await Task.Run(() => _autorunService.GetEntries());
+            AutorunEntries.Clear();
+            foreach (var item in list) AutorunEntries.Add(item);
+            OnPropertyChanged(nameof(ActiveAutorunCountText));
+            StatusMessage = $"{list.Count} başlangıç öğesi listelendi (Kayıt Defteri, Başlangıç Klasörü, Windows Uygulamaları ve Zamanlanmış Görevler).";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private void ApplyToolsFilter()
+    {
+        FilteredWindowsTools.Clear();
+        IEnumerable<WindowsToolItem> query = WindowsTools;
+        if (!string.IsNullOrWhiteSpace(_toolsSearchQuery))
+        {
+            query = query.Where(t =>
+                t.Title.Contains(_toolsSearchQuery, StringComparison.OrdinalIgnoreCase) ||
+                t.Description.Contains(_toolsSearchQuery, StringComparison.OrdinalIgnoreCase) ||
+                t.Category.Contains(_toolsSearchQuery, StringComparison.OrdinalIgnoreCase));
+        }
+        foreach (var t in query)
+            FilteredWindowsTools.Add(t);
     }
 
     public async Task ScanJunkAsync()

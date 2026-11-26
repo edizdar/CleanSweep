@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Text.Json;
+using System.Xml.Linq;
 using CleanSweep.Core.Models;
 
 namespace CleanSweep.Core.Discovery;
@@ -26,7 +27,7 @@ public sealed class AppxProvider : IAppDiscoveryProvider
             var psi = new ProcessStartInfo
             {
                 FileName = "powershell.exe",
-                Arguments = "-NoProfile -NonInteractive -ExecutionPolicy Bypass -Command \"Get-AppxPackage | Where-Object { -not $_.IsFramework -and -not $_.NonRemovable -and $_.SignatureKind -ne 'System' } | Select-Object Name,PackageFullName,PackageFamilyName,Publisher,Version,InstallLocation | ConvertTo-Json -Compress\"",
+                Arguments = "-NoProfile -NonInteractive -ExecutionPolicy Bypass -Command \"Get-AppxPackage | Where-Object { -not $_.IsFramework -and -not $_.IsResourcePackage } | Select-Object Name,PackageFullName,PackageFamilyName,Publisher,Version,InstallLocation | ConvertTo-Json -Compress\"",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
@@ -37,7 +38,7 @@ public sealed class AppxProvider : IAppDiscoveryProvider
             if (proc == null) return list;
 
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            cts.CancelAfter(TimeSpan.FromSeconds(12));
+            cts.CancelAfter(TimeSpan.FromSeconds(15));
 
             string json = await proc.StandardOutput.ReadToEndAsync(cts.Token);
             await proc.WaitForExitAsync(cts.Token);
@@ -61,11 +62,15 @@ public sealed class AppxProvider : IAppDiscoveryProvider
                 string publisher = ExtractCn(item.Publisher ?? string.Empty);
                 if (Guid.TryParse(publisher, out _))
                     publisher = "Microsoft Store";
+                else if (publisher.Contains("Microsoft Windows", StringComparison.OrdinalIgnoreCase))
+                    publisher = "Microsoft Windows";
+
+                string displayName = TryReadManifestDisplayName(item.InstallLocation) ?? CleanPackageName(item.Name);
 
                 list.Add(new InstalledApp
                 {
                     Id = $"msix:{item.PackageFullName}",
-                    Name = item.Name,
+                    Name = displayName,
                     Publisher = publisher,
                     Version = item.Version ?? string.Empty,
                     Source = AppSource.Msix,
@@ -85,6 +90,35 @@ public sealed class AppxProvider : IAppDiscoveryProvider
         }
 
         return list;
+    }
+
+    private static string? TryReadManifestDisplayName(string? installLocation)
+    {
+        if (string.IsNullOrWhiteSpace(installLocation)) return null;
+        try
+        {
+            string manifestPath = Path.Combine(installLocation, "AppxManifest.xml");
+            if (!File.Exists(manifestPath)) return null;
+
+            var doc = XDocument.Load(manifestPath);
+            string? val = doc.Descendants().FirstOrDefault(e => e.Name.LocalName == "DisplayName")?.Value;
+            if (!string.IsNullOrWhiteSpace(val) &&
+                !val.StartsWith("ms-resource:", StringComparison.OrdinalIgnoreCase))
+            {
+                return val.Trim();
+            }
+        }
+        catch { }
+        return null;
+    }
+
+    private static string CleanPackageName(string rawName)
+    {
+        if (rawName.StartsWith("Microsoft.", StringComparison.OrdinalIgnoreCase))
+            return rawName["Microsoft.".Length..];
+        if (rawName.StartsWith("MicrosoftWindows.", StringComparison.OrdinalIgnoreCase))
+            return rawName["MicrosoftWindows.".Length..];
+        return rawName;
     }
 
     private static string ExtractCn(string distinguishedName)

@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img alt="Sürüm" src="https://img.shields.io/badge/Sürüm-v0.3.0-3B82F6?style=for-the-badge" />
+  <img alt="Sürüm" src="https://img.shields.io/badge/Sürüm-v0.4.0-3B82F6?style=for-the-badge" />
   <img alt="Platform" src="https://img.shields.io/badge/Platform-Windows%2010%2F11%20(x64)-06B6D4?style=for-the-badge" />
   <img alt=".NET" src="https://img.shields.io/badge/.NET-10.0-512BD4?style=for-the-badge" />
   <img alt="Lisans" src="https://img.shields.io/badge/Lisans-MIT-22C55E?style=for-the-badge" />
@@ -34,8 +34,8 @@ Bilgisayarı karmaşık menüler olmadan tek bakışta yönetebileceğiniz başl
 
 ![Ana Sayfa](docs/screenshots/01-ana-sayfa.png)
 
-### 2. Program Kaldır — Tekli, Toplu ve Zorla Kaldırma
-Win32/MSI, Microsoft Store (MSIX), Scoop ve Chocolatey programlarını gerçek simgeleriyle listeler:
+### 2. Program Kaldır — Tekli, Toplu, Windows Uygulamaları ve Zorla Kaldırma
+Win32/MSI programlarının yanı sıra **tüm Windows Uygulamalarını (Microsoft Store / MSIX)**, Scoop ve Chocolatey paketlerini gerçek simgeleriyle listeler; üstteki filtre butonlarıyla tek tıkla ayırabilirsiniz:
 - Satırın yanındaki **`Kaldır`** butonuyla tek tıkla kaldırıp ardından artık dosya + kayıt defteri anahtarlarını temizleyin.
 - Sol taraftaki **`Seç`** kutucuklarıyla birden fazla programı işaretleyip **`Seçilenleri Toplu Kaldır`** ile Revo tarzında topluca kaldırın.
 - Kaldırıcısı bozulmuş veya listede görünmeyen programlar için **`Silinmiyorsa Zorla Kaldır`** ile çalışan süreçleri kapatıp bozuk MSI/Uninstall kayıtlarını silin.
@@ -43,7 +43,7 @@ Win32/MSI, Microsoft Store (MSIX), Scoop ve Chocolatey programlarını gerçek s
 ![Program Kaldır](docs/screenshots/02-program-kaldir.png)
 
 ### 3. Açılış Programları (Tek Tıkla Aç / Kapat)
-Windows Görev Yöneticisi ile uyumlu (`StartupApproved`) çalışan tıklanabilir **Aç/Kapa anahtarı** ile bilgisayar açılışını yavaşlatan programları anında kapatıp açabilirsiniz:
+Kayıt Defteri (`Run`, `RunOnce`, `Policies`), Başlangıç Klasörleri, **Windows Uygulaması (MSIX) Başlangıç Görevleri** ve **Oturum Açma Zamanlanmış Görevleri** dahil tüm başlangıç öğelerini listeler; Windows Görev Yöneticisi ile uyumlu **Aç/Kapa anahtarı** ile anında yönetebilirsiniz:
 
 ![Açılış Programları](docs/screenshots/03-acilis-programlari.png)
 
@@ -52,8 +52,8 @@ Yalnızca işaretlediğiniz kategorileri tarar; kişisel belgelerinize, fotoğra
 
 ![Bilgisayarı Temizle](docs/screenshots/04-bilgisayari-temizle.png)
 
-### 5. Windows Araçları (15 Yerleşik Araç)
-Sistem Geri Yükleme, Disk Temizleme, Akıllı Depolama, Görev Yöneticisi, Hizmetler, Kayıt Defteri ve Kaynak İzleyici gibi 15 Windows aracına tek tıkla erişim:
+### 5. Windows Araçları (30 Yerleşik Araç + Arama)
+Sistem Geri Yükleme, Disk Yönetimi, Olay Görüntüleyici, Güvenilirlik Geçmişi, Gelişmiş Güvenlik Duvarı, Akıllı Depolama, Görev Yöneticisi, Hizmetler, Kayıt Defteri, `msconfig`, `dxdiag`, Bellek Tanılama ve Ortam Değişkenleri gibi **30 Windows aracına** arama kutusuyla tek tıkla erişim:
 
 ![Windows Araçları](docs/screenshots/05-windows-araclari.png)
 
@@ -61,7 +61,7 @@ Sistem Geri Yükleme, Disk Temizleme, Akıllı Depolama, Görev Yöneticisi, Hiz
 
 ## Revo Uninstaller Pro ile Karşılaştırma
 
-| Özellik | Revo Uninstaller Pro | CleanSweep (`v0.3.0`) |
+| Özellik | Revo Uninstaller Pro | CleanSweep (`v0.4.0`) |
 |---|---|---|
 | **Lisans & Kaynak** | Kapalı kaynak / Ücretli | **MIT Lisansı / %100 Açık Kaynak** |
 | **Kullanım Kolaylığı** | Teknik menüler | **Kolay Mod (4 dev kart) + Uzman Modu** |
@@ -118,8 +118,8 @@ Her güncellemede sürüm numarası `Directory.Build.props` üzerinden artırıl
 GitHub üzerinde yeni sürüm yayınlamak için etiket (tag) oluşturup göndermeniz yeterlidir; [release.yml](.github/workflows/release.yml) otomatik olarak testleri çalıştırır, `.zip` paketini derler ve `CHANGELOG.md` içindeki ilgili sürüm notlarıyla GitHub Release sayfasını yayınlar:
 
 ```powershell
-git tag v0.3.0
-git push origin v0.3.0
+git tag v0.4.0
+git push origin v0.4.0
 ```
 
 ---
@@ -132,7 +132,7 @@ Gereksinimler: **Windows 10/11 (x64)** ve **.NET 10 SDK**.
 # Derle
 dotnet build CleanSweep.sln -c Release
 
-# Otomatik testleri çalıştır (50 test)
+# Otomatik testleri çalıştır (56 test)
 dotnet test CleanSweep.sln -c Release --no-build
 
 # Tek dosya .exe olarak yayınla
