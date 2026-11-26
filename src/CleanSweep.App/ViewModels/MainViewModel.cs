@@ -45,6 +45,9 @@ public sealed class MainViewModel : INotifyPropertyChanged
     private CommunityRule? _selectedRule;
     private string _junkTotalSummary = "Taramak istediğiniz kategorileri işaretleyip 'Seçili Kategorileri Tara' butonuna basın.";
     private string _registrySummaryText = "Taramak istediğiniz kayıt defteri kategorilerini seçip 'Seçili Kategorileri Tara' butonuna basın.";
+    private string _selectedAppsSummary = "Tekli kaldırmak için satırdaki 'Kaldır'a, toplu kaldırmak için kutucuklara tıklayın";
+    private string _updateStatusText = "Yeni sürümleri kontrol etmek için 'Güncellemeleri Denetle' butonuna tıklayın.";
+    private SystemDiskStatus _systemDisk = SystemHealthService.GetSystemDiskStatus();
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -66,8 +69,14 @@ public sealed class MainViewModel : INotifyPropertyChanged
 
     public bool IsAdministrator => NativeFileOps.IsRunningAsAdministrator();
     public string AdminStatusText => IsAdministrator ? "Yönetici Yetkisi Aktif" : "Standart Kullanıcı";
-    public string AppVersion { get; } = "v" + (typeof(MainViewModel).Assembly.GetName().Version?.ToString(3) ?? "0.3.0");
+    public string AppVersion { get; } = "v" + (typeof(MainViewModel).Assembly.GetName().Version?.ToString(3) ?? "0.6.0");
     public string WindowTitle => $"CleanSweep {AppVersion} — Açık Kaynak Derin Kaldırıcı";
+    public string DeveloperName => "Erol Dizdar";
+    public string DeveloperWebsite => "https://www.eroldizdar.tr";
+    public string ProjectGitHubUrl => "https://github.com/edizdar/CleanSweep";
+    public SystemDiskStatus SystemDisk => _systemDisk;
+    public string DiskSummaryText => _systemDisk.SummaryText;
+    public double DiskUsedPercent => _systemDisk.UsedPercent;
 
     public bool IsExpertMode
     {
@@ -194,6 +203,18 @@ public sealed class MainViewModel : INotifyPropertyChanged
         set { _registrySummaryText = value; OnPropertyChanged(); }
     }
 
+    public string SelectedAppsSummary
+    {
+        get => _selectedAppsSummary;
+        set { _selectedAppsSummary = value; OnPropertyChanged(); }
+    }
+
+    public string UpdateStatusText
+    {
+        get => _updateStatusText;
+        set { _updateStatusText = value; OnPropertyChanged(); }
+    }
+
     public bool HasNoTraces => SavedTraces.Count == 0;
     public bool HasNoQuarantine => QuarantineSessions.Count == 0;
     public bool HasNoExtensions => BrowserExtensions.Count == 0;
@@ -254,7 +275,18 @@ public sealed class MainViewModel : INotifyPropertyChanged
             _allAppItems = await Task.Run(() =>
                 raw.Select(a => new AppDisplayItem(a, IconExtractor.GetIcon(a.DisplayIcon, a.InstallLocation, a.UninstallString))).ToList());
 
+            foreach (var item in _allAppItems)
+            {
+                item.PropertyChanged += (_, e) =>
+                {
+                    if (e.PropertyName == nameof(AppDisplayItem.IsChecked))
+                        RecalculateSelectedAppsSummary();
+                };
+            }
+
             ApplyFilter();
+            RecalculateSelectedAppsSummary();
+            RefreshSystemDisk();
             OnPropertyChanged(nameof(TotalAppsCountText));
             StatusMessage = $"{_allApps.Count} program hazır.";
         }
@@ -478,6 +510,22 @@ public sealed class MainViewModel : INotifyPropertyChanged
 
         foreach (var app in query)
             FilteredApps.Add(app);
+    }
+
+    public void RefreshSystemDisk()
+    {
+        _systemDisk = SystemHealthService.GetSystemDiskStatus();
+        OnPropertyChanged(nameof(SystemDisk));
+        OnPropertyChanged(nameof(DiskSummaryText));
+        OnPropertyChanged(nameof(DiskUsedPercent));
+    }
+
+    public void RecalculateSelectedAppsSummary()
+    {
+        int count = _allAppItems.Count(a => a.IsChecked);
+        SelectedAppsSummary = count > 0
+            ? $"{count} program toplu kaldırma için seçildi"
+            : "Tekli kaldırmak için satırdaki 'Kaldır'a, toplu kaldırmak için kutucuklara tıklayın";
     }
 
     private void OnPropertyChanged([CallerMemberName] string? name = null) =>

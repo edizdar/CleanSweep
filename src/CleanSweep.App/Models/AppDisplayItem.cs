@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Media;
+using CleanSweep.Core.Discovery;
 using CleanSweep.Core.Models;
 
 namespace CleanSweep.App.Models;
@@ -31,6 +32,7 @@ public sealed class AppDisplayItem : INotifyPropertyChanged
     public AppSource Source => App.Source;
     public InstallerType InstallerType => App.InstallerType;
     public string FormattedSize => App.FormattedSize;
+    public string FormattedInstallDate => AppExportService.FormatInstallDate(App.InstallDate);
     public string InstallLocation => App.InstallLocation;
     public string UninstallString => App.UninstallString;
     public string RegistryKeyPath => App.RegistryKeyPath;

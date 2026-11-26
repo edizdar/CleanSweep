@@ -27,6 +27,7 @@ internal static class Program
         if (args[0] is "--version" or "-v" or "version")
         {
             Console.WriteLine($"CleanSweep CLI v{GetAppVersion()}");
+            Console.WriteLine("Geliştirici: Erol Dizdar | Web: https://www.eroldizdar.tr");
             return 0;
         }
 
@@ -39,6 +40,7 @@ internal static class Program
             return command switch
             {
                 "list" => await HandleListAsync(rest, asJson),
+                "export" => await HandleExportAsync(rest),
                 "scan" => await HandleScanAsync(rest, asJson),
                 "uninstall" => await HandleUninstallAsync(rest, asJson),
                 "force-uninstall" => await HandleForceUninstallAsync(rest, asJson),
@@ -485,6 +487,28 @@ internal static class Program
         return 2;
     }
 
+    private static async Task<int> HandleExportAsync(string[] args)
+    {
+        string? outputPath = GetPositional(args);
+        if (string.IsNullOrWhiteSpace(outputPath))
+        {
+            Console.Error.WriteLine("Kullanım: cleansweep export <dosya.html|dosya.csv>");
+            return 2;
+        }
+
+        string fullPath = Path.GetFullPath(outputPath);
+        var inventory = new AppInventoryService();
+        var apps = await inventory.GetInstalledAppsAsync();
+
+        if (fullPath.EndsWith(".csv", StringComparison.OrdinalIgnoreCase))
+            AppExportService.ExportToCsv(apps, fullPath);
+        else
+            AppExportService.ExportToHtml(apps, fullPath, GetAppVersion());
+
+        Console.WriteLine($"Toplam {apps.Count} program dışa aktarıldı: {fullPath}");
+        return 0;
+    }
+
     private static InstalledApp? FindTargetApp(IReadOnlyList<InstalledApp> apps, string query)
     {
         return apps.FirstOrDefault(a => a.Name.Equals(query, StringComparison.OrdinalIgnoreCase))
@@ -535,10 +559,12 @@ internal static class Program
     {
         Console.WriteLine($"""
 CleanSweep CLI v{GetAppVersion()} — Açık Kaynak Modern Windows Kaldırıcı
+Geliştirici: Erol Dizdar | Web: https://www.eroldizdar.tr
 
 Kullanım:
   cleansweep --version
   cleansweep list [--source all|win32|msix|scoop|choco] [--search <metin>] [--json]
+  cleansweep export <dosya.html|dosya.csv>
   cleansweep scan "<uygulama-adı>" [--json]
   cleansweep uninstall "<uygulama-adı>" [--quiet] [--clean-leftovers] [--min-confidence 80] [--no-quarantine] [--dry-run]
   cleansweep force-uninstall "<uygulama-veya-klasör>" [--mode safe|moderate|advanced] [--kill-processes] [--no-quarantine] [--dry-run]

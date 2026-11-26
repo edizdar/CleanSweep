@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img alt="Sürüm" src="https://img.shields.io/badge/Sürüm-v0.5.0-3B82F6?style=for-the-badge" />
+  <img alt="Sürüm" src="https://img.shields.io/badge/Sürüm-v0.6.0-3B82F6?style=for-the-badge" />
   <img alt="Platform" src="https://img.shields.io/badge/Platform-Windows%2010%2F11%20(x64)-06B6D4?style=for-the-badge" />
   <img alt=".NET" src="https://img.shields.io/badge/.NET-10.0-512BD4?style=for-the-badge" />
   <img alt="Lisans" src="https://img.shields.io/badge/Lisans-MIT-22C55E?style=for-the-badge" />
@@ -62,11 +62,18 @@ Kaldırılmış programlardan geride kalan kırık `Uninstall`, `Run/RunOnce`, `
 
 ![Kayıt Defteri Temizleyici](docs/screenshots/06-kayit-defteri-temizleyici.png)
 
+### 7. Hakkında, Güncelleme Denetimi ve Listeyi Dışa Aktarma
+- Sol menüde kalıcı olarak yer alan geliştirici kartı ve **`Hakkında & Güncelleme`** sekmesinden GitHub üzerinden tek tıkla yeni sürüm kontrolü yapabilirsiniz.
+- **`Program Kaldır`** sekmesinde kurulum **Tarihi** görüntülenir ve tek tıkla tüm program envanteri **`HTML` / `CSV`** raporu olarak dışa aktarılabilir.
+- **`Geri Al (Karantina)`** sekmesinde yerleşik Windows **Sistem Geri Yükleme Noktası** oluşturabilirsiniz.
+
+![Hakkında & Güncelleme](docs/screenshots/07-hakkinda.png)
+
 ---
 
 ## Revo Uninstaller Pro ile Karşılaştırma
 
-| Özellik | Revo Uninstaller Pro | CleanSweep (`v0.5.0`) |
+| Özellik | Revo Uninstaller Pro | CleanSweep (`v0.6.0`) |
 |---|---|---|
 | **Lisans & Kaynak** | Kapalı kaynak / Ücretli | **MIT Lisansı / %100 Açık Kaynak** |
 | **Kullanım Kolaylığı** | Teknik menüler | **Kolay Mod (4 dev kart) + Uzman Modu** |
@@ -103,6 +110,9 @@ cleansweep --version
 # Kurulu programları listele (Win32, MSIX, Scoop, Chocolatey)
 cleansweep list --source all --search discord
 
+# Kurulu program listesini HTML veya CSV raporu olarak dışa aktar
+cleansweep export programlar.html
+
 # Salt-okunur kalıntı analizi
 cleansweep scan "Discord"
 
@@ -127,8 +137,8 @@ Her güncellemede sürüm numarası `Directory.Build.props` üzerinden artırıl
 GitHub üzerinde yeni sürüm yayınlamak için etiket (tag) oluşturup göndermeniz yeterlidir; [release.yml](.github/workflows/release.yml) otomatik olarak testleri çalıştırır, `.zip` paketini derler ve `CHANGELOG.md` içindeki ilgili sürüm notlarıyla GitHub Release sayfasını yayınlar:
 
 ```powershell
-git tag v0.5.0
-git push origin v0.5.0
+git tag v0.6.0
+git push origin v0.6.0
 ```
 
 ---
@@ -141,15 +151,17 @@ Gereksinimler: **Windows 10/11 (x64)** ve **.NET 10 SDK**.
 # Derle
 dotnet build CleanSweep.sln -c Release
 
-# Otomatik testleri çalıştır (56 test)
+# Otomatik testleri çalıştır (65 test)
 dotnet test CleanSweep.sln -c Release --no-build
 
 # Tek dosya .exe olarak yayınla
 dotnet publish src/CleanSweep.App/CleanSweep.App.csproj -c Release -r win-x64 -p:SelfContained=false -p:PublishSingleFile=true -o publish
 ```
 
-## Katkıda Bulunma & Güvenlik
+## Geliştirici & Katkıda Bulunma
 
+- **Geliştirici:** Erol Dizdar
+- **Web:** [https://www.eroldizdar.tr](https://www.eroldizdar.tr)
 - Katkı ve yeni topluluk kuralı ekleme rehberi: [CONTRIBUTING.md](CONTRIBUTING.md)
 - Güvenlik mimarisi ve sorumlu bildirim: [SECURITY.md](SECURITY.md)
 - Lisans: [MIT](LICENSE)

@@ -2,12 +2,15 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Threading;
 using CleanSweep.App.Models;
 using CleanSweep.App.ViewModels;
 using CleanSweep.Core.Cleaner;
+using CleanSweep.Core.Discovery;
 using CleanSweep.Core.Models;
 using CleanSweep.Core.Tools;
 using CleanSweep.Core.Tracing;
@@ -73,6 +76,10 @@ public partial class MainWindow : Window
         PanelMonitor.Visibility = NavMonitor.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
         PanelQuarantine.Visibility = NavQuarantine.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
         PanelRules.Visibility = NavRules.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
+        PanelAbout.Visibility = NavAbout.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
+
+        if (NavHome.IsChecked == true)
+            _vm.RefreshSystemDisk();
 
         if (NavBrowsers.IsChecked == true && !_browsersLoaded)
         {
@@ -830,5 +837,143 @@ public partial class MainWindow : Window
         NavRegistry.IsChecked = true;
         await _vm.ScanRegistryAsync();
         await RenderAsync("06-kayit-defteri-temizleyici.png");
+
+        NavAbout.IsChecked = true;
+        await RenderAsync("07-hakkinda.png");
+    }
+
+    private void OpenHyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true });
+            e.Handled = true;
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Bağlantı açılamadı: {ex.Message}", "CleanSweep", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+    }
+
+    private void OpenDeveloperWeb_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo(_vm.DeveloperWebsite) { UseShellExecute = true });
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Web sitesi açılamadı: {ex.Message}", "CleanSweep", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+    }
+
+    private void ExportAppsList_Click(object sender, RoutedEventArgs e)
+    {
+        var apps = _vm.FilteredApps.Select(a => a.App).ToList();
+        if (apps.Count == 0)
+        {
+            MessageBox.Show("Dışa aktarılacak program bulunamadı.", "CleanSweep", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        var dlg = new SaveFileDialog
+        {
+            Title = "Program Listesini Dışa Aktar",
+            Filter = "HTML Raporu (*.html)|*.html|CSV Tablosu (*.csv)|*.csv",
+            FileName = $"CleanSweep-Program-Listesi-{DateTime.Now:yyyyMMdd}.html"
+        };
+
+        if (dlg.ShowDialog() != true) return;
+
+        try
+        {
+            if (dlg.FileName.EndsWith(".csv", StringComparison.OrdinalIgnoreCase))
+                AppExportService.ExportToCsv(apps, dlg.FileName);
+            else
+                AppExportService.ExportToHtml(apps, dlg.FileName, _vm.AppVersion);
+
+            _vm.StatusMessage = $"{apps.Count} program dışa aktarıldı: {dlg.FileName}";
+            if (MessageBox.Show($"{apps.Count} program başarıyla dışa aktarıldı:\n{dlg.FileName}\n\nDosyayı şimdi açmak ister misiniz?",
+                    "Dışa Aktarma Tamamlandı", MessageBoxButton.YesNo, MessageBoxImage.Information) == MessageBoxResult.Yes)
+            {
+                Process.Start(new ProcessStartInfo(dlg.FileName) { UseShellExecute = true });
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Dışa aktarma başarısız: {ex.Message}", "CleanSweep", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private async void CreateRestorePoint_Click(object sender, RoutedEventArgs e)
+    {
+        _vm.IsBusy = true;
+        _vm.StatusMessage = "Windows Sistem Geri Yükleme Noktası oluşturuluyor...";
+        try
+        {
+            var (ok, message) = await SystemHealthService.CreateSystemRestorePointAsync("CleanSweep Yedek Noktası");
+            _vm.StatusMessage = message;
+            MessageBox.Show(message, "Sistem Geri Yükleme Noktası",
+                MessageBoxButton.OK, ok ? MessageBoxImage.Information : MessageBoxImage.Warning);
+        }
+        finally
+        {
+            _vm.IsBusy = false;
+        }
+    }
+
+    private async void CheckUpdates_Click(object sender, RoutedEventArgs e)
+    {
+        _vm.IsBusy = true;
+        _vm.UpdateStatusText = "GitHub üzerinden son sürüm kontrol ediliyor...";
+        try
+        {
+            var res = await UpdateCheckService.CheckLatestReleaseAsync(_vm.AppVersion);
+            _vm.UpdateStatusText = res.Message;
+            _vm.StatusMessage = res.Message;
+
+            if (res.Success && res.IsUpdateAvailable)
+            {
+                if (MessageBox.Show($"{res.Message}\n\nİndirme sayfasını tarayıcıda açmak ister misiniz?",
+                        "CleanSweep Güncelleme", MessageBoxButton.YesNo, MessageBoxImage.Information) == MessageBoxResult.Yes)
+                {
+                    Process.Start(new ProcessStartInfo(res.ReleaseUrl) { UseShellExecute = true });
+                }
+            }
+        }
+        finally
+        {
+            _vm.IsBusy = false;
+        }
+    }
+
+    private async void Window_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.F && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+        {
+            if (PanelApps.Visibility == Visibility.Visible)
+                SearchBox.Focus();
+            else if (PanelTools.Visibility == Visibility.Visible)
+                ToolsSearchBox.Focus();
+            e.Handled = true;
+        }
+        else if (e.Key == Key.F5)
+        {
+            if (PanelApps.Visibility == Visibility.Visible)
+                await _vm.RefreshAppsAsync();
+            else if (PanelBrowsers.Visibility == Visibility.Visible)
+                await _vm.RefreshExtensionsAsync();
+            else if (PanelAutorun.Visibility == Visibility.Visible)
+                await _vm.RefreshAutorunAsync();
+            else if (PanelJunk.Visibility == Visibility.Visible)
+                await _vm.ScanJunkAsync();
+            else if (PanelRegistry.Visibility == Visibility.Visible)
+                await _vm.ScanRegistryAsync();
+            else if (PanelQuarantine.Visibility == Visibility.Visible || PanelMonitor.Visibility == Visibility.Visible || PanelRules.Visibility == Visibility.Visible)
+                _vm.RefreshAuxiliaryTabs();
+            else if (PanelHome.Visibility == Visibility.Visible)
+                _vm.RefreshSystemDisk();
+            e.Handled = true;
+        }
     }
 }

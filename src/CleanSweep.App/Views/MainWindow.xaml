@@ -6,7 +6,8 @@
         Background="{StaticResource BgPrimaryBrush}"
         Foreground="{StaticResource TextPrimaryBrush}"
         Width="1300" Height="840" MinWidth="1060" MinHeight="690"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        KeyDown="Window_KeyDown">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="68"/>
@@ -59,88 +60,113 @@
                 Background="{StaticResource BgSurfaceBrush}"
                 BorderBrush="{StaticResource BorderBrush}"
                 BorderThickness="0,0,1,0"
-                Padding="0,12">
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <StackPanel>
-                    <RadioButton x:Name="NavHome" Style="{StaticResource SidebarNavButton}" IsChecked="True" Checked="NavChanged">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE80F;" FontSize="15" Margin="0,0,10,0" VerticalAlignment="Center"/>
-                            <TextBlock Text="Ana Sayfa" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </RadioButton>
-
-                    <TextBlock Text="KALDIRMA" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextSecondaryBrush}" Margin="18,14,10,6"/>
-                    <RadioButton x:Name="NavApps" Style="{StaticResource SidebarNavButton}" Checked="NavChanged">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE71D;" FontSize="15" Margin="0,0,10,0" VerticalAlignment="Center"/>
-                            <TextBlock Text="Program Kaldır" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </RadioButton>
-                    <RadioButton x:Name="NavBrowsers" Style="{StaticResource SidebarNavButton}" Checked="NavChanged">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE774;" FontSize="15" Margin="0,0,10,0" VerticalAlignment="Center"/>
-                            <TextBlock Text="Tarayıcı Eklentileri" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </RadioButton>
-
-                    <TextBlock Text="TEMİZLİK &amp; HIZ" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextSecondaryBrush}" Margin="18,14,10,6"/>
-                    <RadioButton x:Name="NavAutorun" Style="{StaticResource SidebarNavButton}" Checked="NavChanged">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE7E8;" FontSize="15" Margin="0,0,10,0" VerticalAlignment="Center"/>
-                            <TextBlock Text="Açılış Programları" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </RadioButton>
-                    <RadioButton x:Name="NavJunk" Style="{StaticResource SidebarNavButton}" Checked="NavChanged">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE74D;" FontSize="15" Margin="0,0,10,0" VerticalAlignment="Center"/>
-                            <TextBlock Text="Bilgisayarı Temizle" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </RadioButton>
-                    <RadioButton x:Name="NavRegistry" Style="{StaticResource SidebarNavButton}" Checked="NavChanged">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE9F5;" FontSize="15" Margin="0,0,10,0" VerticalAlignment="Center"/>
-                            <TextBlock Text="Kayıt Defteri Temizle" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </RadioButton>
-                    <RadioButton x:Name="NavTools" Style="{StaticResource SidebarNavButton}" Checked="NavChanged">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE90F;" FontSize="15" Margin="0,0,10,0" VerticalAlignment="Center"/>
-                            <TextBlock Text="Windows Araçları" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </RadioButton>
-
-                    <TextBlock Text="GÜVENLİK &amp; GERİ AL" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextSecondaryBrush}" Margin="18,14,10,6"/>
-                    <RadioButton x:Name="NavQuarantine" Style="{StaticResource SidebarNavButton}" Checked="NavChanged">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE7A7;" FontSize="15" Margin="0,0,10,0" VerticalAlignment="Center"/>
-                            <TextBlock Text="Geri Al (Karantina)" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </RadioButton>
-
-                    <!-- Expert-only Tabs -->
-                    <StackPanel Visibility="{Binding IsExpertMode, Converter={StaticResource BoolToVis}}">
-                        <TextBlock Text="UZMAN ARAÇLARI" FontSize="11" FontWeight="Bold" Foreground="{StaticResource CyanAccentBrush}" Margin="18,14,10,6"/>
-                        <RadioButton x:Name="NavShredder" Style="{StaticResource SidebarNavButton}" Checked="NavChanged">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE75C;" FontSize="15" Margin="0,0,10,0" VerticalAlignment="Center"/>
-                                <TextBlock Text="Kalıcı Dosya Öğütücü" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </RadioButton>
-                        <RadioButton x:Name="NavMonitor" Style="{StaticResource SidebarNavButton}" Checked="NavChanged">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE7C4;" FontSize="15" Margin="0,0,10,0" VerticalAlignment="Center"/>
-                                <TextBlock Text="Kurulum İzleyici &amp; İzler" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </RadioButton>
-                        <RadioButton x:Name="NavRules" Style="{StaticResource SidebarNavButton}" Checked="NavChanged">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8F1;" FontSize="15" Margin="0,0,10,0" VerticalAlignment="Center"/>
-                                <TextBlock Text="Topluluk Kuralları" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </RadioButton>
+                Padding="0,12,0,8">
+            <DockPanel LastChildFill="True">
+                <!-- Persistent Developer Signature -->
+                <Border DockPanel.Dock="Bottom"
+                        Background="{StaticResource BgCardBrush}"
+                        BorderBrush="{StaticResource BorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Margin="10,8,10,2"
+                        Padding="10,8">
+                    <StackPanel>
+                        <TextBlock Text="Geliştirici: Erol Dizdar" FontSize="11.5" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                        <TextBlock FontSize="11" Margin="0,2,0,0" TextTrimming="CharacterEllipsis">
+                            <Run Text="Web: " Foreground="{StaticResource TextSecondaryBrush}"/>
+                            <Hyperlink NavigateUri="https://www.eroldizdar.tr" RequestNavigate="OpenHyperlink_RequestNavigate" Foreground="#60A5FA">https://www.eroldizdar.tr</Hyperlink>
+                        </TextBlock>
                     </StackPanel>
-                </StackPanel>
-            </ScrollViewer>
+                </Border>
+
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <RadioButton x:Name="NavHome" Style="{StaticResource SidebarNavButton}" IsChecked="True" Checked="NavChanged">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE80F;" FontSize="15" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Ana Sayfa" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </RadioButton>
+
+                        <TextBlock Text="KALDIRMA" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextSecondaryBrush}" Margin="18,14,10,6"/>
+                        <RadioButton x:Name="NavApps" Style="{StaticResource SidebarNavButton}" Checked="NavChanged">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE71D;" FontSize="15" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Program Kaldır" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </RadioButton>
+                        <RadioButton x:Name="NavBrowsers" Style="{StaticResource SidebarNavButton}" Checked="NavChanged">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE774;" FontSize="15" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Tarayıcı Eklentileri" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </RadioButton>
+
+                        <TextBlock Text="TEMİZLİK &amp; HIZ" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextSecondaryBrush}" Margin="18,14,10,6"/>
+                        <RadioButton x:Name="NavAutorun" Style="{StaticResource SidebarNavButton}" Checked="NavChanged">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE7E8;" FontSize="15" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Açılış Programları" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </RadioButton>
+                        <RadioButton x:Name="NavJunk" Style="{StaticResource SidebarNavButton}" Checked="NavChanged">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE74D;" FontSize="15" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Bilgisayarı Temizle" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </RadioButton>
+                        <RadioButton x:Name="NavRegistry" Style="{StaticResource SidebarNavButton}" Checked="NavChanged">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE9F5;" FontSize="15" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Kayıt Defteri Temizle" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </RadioButton>
+                        <RadioButton x:Name="NavTools" Style="{StaticResource SidebarNavButton}" Checked="NavChanged">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE90F;" FontSize="15" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Windows Araçları" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </RadioButton>
+
+                        <TextBlock Text="GÜVENLİK &amp; GERİ AL" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextSecondaryBrush}" Margin="18,14,10,6"/>
+                        <RadioButton x:Name="NavQuarantine" Style="{StaticResource SidebarNavButton}" Checked="NavChanged">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE7A7;" FontSize="15" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Geri Al (Karantina)" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </RadioButton>
+                        <RadioButton x:Name="NavAbout" Style="{StaticResource SidebarNavButton}" Checked="NavChanged">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE946;" FontSize="15" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Hakkında &amp; Güncelleme" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </RadioButton>
+
+                        <!-- Expert-only Tabs -->
+                        <StackPanel Visibility="{Binding IsExpertMode, Converter={StaticResource BoolToVis}}">
+                            <TextBlock Text="UZMAN ARAÇLARI" FontSize="11" FontWeight="Bold" Foreground="{StaticResource CyanAccentBrush}" Margin="18,14,10,6"/>
+                            <RadioButton x:Name="NavShredder" Style="{StaticResource SidebarNavButton}" Checked="NavChanged">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE75C;" FontSize="15" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Kalıcı Dosya Öğütücü" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
+                            <RadioButton x:Name="NavMonitor" Style="{StaticResource SidebarNavButton}" Checked="NavChanged">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE7C4;" FontSize="15" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Kurulum İzleyici &amp; İzler" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
+                            <RadioButton x:Name="NavRules" Style="{StaticResource SidebarNavButton}" Checked="NavChanged">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8F1;" FontSize="15" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Topluluk Kuralları" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </DockPanel>
         </Border>
 
         <!-- Main Content Area -->
@@ -158,18 +184,34 @@
                                 <GradientStop Color="#12344D" Offset="1"/>
                             </LinearGradientBrush>
                         </Border.Background>
-                        <StackPanel>
-                            <TextBlock Text="Ne yapmak istersiniz?" FontSize="24" FontWeight="Bold"/>
-                            <TextBlock Text="Karmaşık ayarlarla uğraşmadan bilgisayarınızdaki gereksiz programları ve çöp dosyaları güvenle temizleyin."
-                                       FontSize="14" Foreground="#CBD5E1" Margin="0,6,0,14"/>
-                            <Border Background="#134E2E" BorderBrush="#22C55E" BorderThickness="1" CornerRadius="14" Padding="12,6" HorizontalAlignment="Left">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xEA18;" Foreground="#4ADE80" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Güvenlik Kalkanı Aktif: Silinen her şey 'Geri Al (Karantina)' bölümünden tek tıkla geri getirilebilir."
-                                               Foreground="#DCFCE7" FontSize="12.5" FontWeight="SemiBold"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="280"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                                <TextBlock Text="Ne yapmak istersiniz?" FontSize="24" FontWeight="Bold"/>
+                                <TextBlock Text="Karmaşık ayarlarla uğraşmadan bilgisayarınızdaki gereksiz programları ve çöp dosyaları güvenle temizleyin."
+                                           FontSize="14" Foreground="#CBD5E1" Margin="0,6,0,14" TextWrapping="Wrap"/>
+                                <Border Background="#134E2E" BorderBrush="#22C55E" BorderThickness="1" CornerRadius="14" Padding="12,6" HorizontalAlignment="Left">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xEA18;" Foreground="#4ADE80" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Güvenlik Kalkanı Aktif: Silinen her şey 'Geri Al (Karantina)' bölümünden tek tıkla geri getirilebilir."
+                                                   Foreground="#DCFCE7" FontSize="12.5" FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+
+                            <Border Grid.Column="1" Background="#0E1B31" BorderBrush="#2A4A7F" BorderThickness="1" CornerRadius="10" Padding="14" VerticalAlignment="Center">
+                                <StackPanel>
+                                    <TextBlock Text="Sistem Diski Durumu" FontSize="13" FontWeight="Bold" Foreground="#93C5FD"/>
+                                    <TextBlock Text="{Binding DiskSummaryText}" FontSize="12" Foreground="#E2E8F0" Margin="0,4,0,8" TextWrapping="Wrap"/>
+                                    <ProgressBar Value="{Binding DiskUsedPercent, Mode=OneWay}" Maximum="100" Height="8" Foreground="#38BDF8" Background="#1E293B"/>
+                                    <TextBlock Text="{Binding SystemDisk.OsDescription}" FontSize="11" Foreground="#94A3B8" Margin="0,8,0,0" TextTrimming="CharacterEllipsis"/>
                                 </StackPanel>
                             </Border>
-                        </StackPanel>
+                        </Grid>
                     </Border>
 
                     <!-- 4 Giant Primary Action Cards -->
@@ -292,6 +334,8 @@
                                    Visibility="{Binding Text.IsEmpty, ElementName=SearchBox, Converter={StaticResource BoolToVis}}"/>
                     </Grid>
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" HorizontalAlignment="Right">
+                        <Button Content="Listeyi Dışa Aktar" Click="ExportAppsList_Click" Margin="0,0,8,0"
+                                ToolTip="Görüntülenen program listesini HTML veya CSV raporu olarak kaydeder."/>
                         <Button Content="Listeyi Yenile" Click="RefreshApps_Click"/>
                     </StackPanel>
                 </DockPanel>
@@ -341,8 +385,9 @@
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
                         <DataGridTextColumn Header="Üretici / Yayıncı" Binding="{Binding Publisher}" ElementStyle="{StaticResource GridCellTextStyle}" Width="1.2*" MinWidth="120"/>
-                        <DataGridTextColumn Header="Sürüm" Binding="{Binding Version}" ElementStyle="{StaticResource GridCellTextStyle}" Width="100"/>
-                        <DataGridTextColumn Header="Boyut" Binding="{Binding FormattedSize}" ElementStyle="{StaticResource GridCellTextStyle}" Width="85"/>
+                        <DataGridTextColumn Header="Sürüm" Binding="{Binding Version}" ElementStyle="{StaticResource GridCellTextStyle}" Width="92"/>
+                        <DataGridTextColumn Header="Boyut" Binding="{Binding FormattedSize}" ElementStyle="{StaticResource GridCellTextStyle}" Width="82"/>
+                        <DataGridTextColumn Header="Tarih" Binding="{Binding FormattedInstallDate}" ElementStyle="{StaticResource GridCellTextStyle}" Width="92"/>
                         <DataGridTemplateColumn Header="İşlem" Width="96">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
@@ -383,7 +428,7 @@
                             <Button Content="Sadece Kalıntı Tara" Click="PreviewScan_Click"
                                     Visibility="{Binding IsExpertMode, Converter={StaticResource BoolToVis}}"/>
                         </StackPanel>
-                        <TextBlock Text="Tekli kaldırmak için satırdaki 'Kaldır'a, toplu kaldırmak için kutucuklara tıklayın" VerticalAlignment="Center" DockPanel.Dock="Right" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                        <TextBlock Text="{Binding SelectedAppsSummary}" VerticalAlignment="Center" DockPanel.Dock="Right" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
                     </DockPanel>
                 </Border>
             </Grid>
@@ -681,8 +726,11 @@
                 <Border Grid.Row="1" Background="{StaticResource BgCardBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="10" Padding="14" Margin="0,10,0,10">
                     <DockPanel LastChildFill="False">
                         <TextBlock Text="CleanSweep ile sildiğiniz her dosya ve ayar burada güvenle saklanır. Bir program eksik çalışırsa seçip 'Eski Haline Geri Yükle'ye basmanız yeterlidir."
-                                   Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" TextWrapping="Wrap" MaxWidth="720" DockPanel.Dock="Left"/>
-                        <Button Content="Yenile" Click="RefreshAux_Click" DockPanel.Dock="Right"/>
+                                   Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" TextWrapping="Wrap" MaxWidth="620" DockPanel.Dock="Left"/>
+                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                            <Button Content="Sistem Geri Yükleme Noktası Oluştur" Style="{StaticResource SafeActionButton}" Click="CreateRestorePoint_Click" Margin="0,0,8,0"/>
+                            <Button Content="Yenile" Click="RefreshAux_Click"/>
+                        </StackPanel>
                     </DockPanel>
                 </Border>
 
@@ -866,6 +914,81 @@
                                Text="{Binding RulesDirectory, StringFormat='Kural Dizini: {0}'}"/>
                 </DockPanel>
             </Grid>
+
+            <!-- TAB 10: About & Updates -->
+            <ScrollViewer x:Name="PanelAbout" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock Text="Hakkında &amp; Güncelleme" FontSize="20" FontWeight="Bold" Margin="0,0,0,12"/>
+
+                    <Border Background="{StaticResource BgCardBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="12" Padding="22" Margin="0,0,0,14">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/Assets/cleansweep.png" Width="64" Height="64" Margin="0,0,18,0" RenderOptions.BitmapScalingMode="HighQuality"/>
+                            <StackPanel VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                    <TextBlock Text="CleanSweep" FontSize="22" FontWeight="Bold"/>
+                                    <Border Background="#1D365D" BorderBrush="#3B82F6" BorderThickness="1" CornerRadius="10" Padding="10,2" Margin="10,0,0,0" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding AppVersion}" FontSize="12" FontWeight="Bold" Foreground="#93C5FD"/>
+                                    </Border>
+                                </StackPanel>
+                                <TextBlock Text="Açık Kaynak, Sürücüsüz, Herkes İçin Kolay ve Güvenli Windows Kaldırıcı &amp; Sistem Temizleyicisi"
+                                           Foreground="{StaticResource TextSecondaryBrush}" FontSize="13"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="{StaticResource BgCardBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="12" Padding="20" Margin="0,0,0,14">
+                        <StackPanel>
+                            <TextBlock Text="Geliştirici ve Proje Bilgileri" FontSize="15.5" FontWeight="Bold" Margin="0,0,0,12"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="160"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="28"/>
+                                    <RowDefinition Height="28"/>
+                                    <RowDefinition Height="28"/>
+                                    <RowDefinition Height="28"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Geliştirici:" Foreground="{StaticResource TextSecondaryBrush}" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Row="0" Grid.Column="1" Text="Erol Dizdar" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Web:" Foreground="{StaticResource TextSecondaryBrush}" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Row="1" Grid.Column="1">
+                                    <Hyperlink NavigateUri="https://www.eroldizdar.tr" RequestNavigate="OpenHyperlink_RequestNavigate" Foreground="#60A5FA">https://www.eroldizdar.tr</Hyperlink>
+                                </TextBlock>
+
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="GitHub Deposu:" Foreground="{StaticResource TextSecondaryBrush}" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Row="2" Grid.Column="1">
+                                    <Hyperlink NavigateUri="https://github.com/edizdar/CleanSweep" RequestNavigate="OpenHyperlink_RequestNavigate" Foreground="#60A5FA">https://github.com/edizdar/CleanSweep</Hyperlink>
+                                </TextBlock>
+
+                                <TextBlock Grid.Row="3" Grid.Column="0" Text="Lisans:" Foreground="{StaticResource TextSecondaryBrush}" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Row="3" Grid.Column="1" Text="MIT Açık Kaynak Lisansı — Ücretsiz ve Sürücüsüz" Foreground="{StaticResource SafeBrush}"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="{StaticResource BgCardBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="12" Padding="20" Margin="0,0,0,14">
+                        <DockPanel LastChildFill="False">
+                            <StackPanel DockPanel.Dock="Left" MaxWidth="620">
+                                <TextBlock Text="Sürüm ve Güncelleme Denetimi" FontSize="15.5" FontWeight="Bold" Margin="0,0,0,4"/>
+                                <TextBlock Text="{Binding UpdateStatusText}" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
+                                <Button Content="Güncellemeleri Denetle" Style="{StaticResource AccentButton}" Click="CheckUpdates_Click" Margin="0,0,8,0"/>
+                                <Button Content="Web Sitesini Aç" Click="OpenDeveloperWeb_Click"/>
+                            </StackPanel>
+                        </DockPanel>
+                    </Border>
+
+                    <Border Background="{StaticResource BgSurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="10" Padding="14">
+                        <TextBlock Text="Klavye Kısayolları:   Ctrl+F — Listede Ara   •   F5 — Aktif Sekmeyi Yenile"
+                                   Foreground="{StaticResource TextSecondaryBrush}" FontSize="12.5"/>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
         </Grid>
 
         <!-- Status Bar -->

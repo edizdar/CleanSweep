@@ -2,6 +2,20 @@
 
 Bu dosya CleanSweep projesinin her sürümünde yapılan değişiklikleri ve neden güncellendiğini belgelemek için tutulur. GitHub'da oluşturulan her yeni Release notu bu dosyadaki ilgili sürüm başlığından otomatik alınır.
 
+## [0.6.0] - 2026-11-26
+
+### Neden Güncellendi?
+Uygulamanın genel kullanıcı deneyimi, sistem koruma araçları ve raporlama özellikleri geliştirildi; sistem disk durumu özeti, program listesi dışa aktarma, kurulum tarihi sütunu, tek tıkla Windows Sistem Geri Yükleme Noktası oluşturma, GitHub güncelleme denetimi ve kalıcı geliştirici imza/hakkında ekranı eklendi.
+
+### Yeni Özellikler
+- **Geliştirici İmzası & Yeni `Hakkında & Güncelleme` Sekmesi**: Sol kenar çubuğunun altında kalıcı **`Geliştirici: Erol Dizdar | Web: https://www.eroldizdar.tr`** kartı ve GitHub Release üzerinden tek tıkla sürüm kontrolü yapabilen **`Hakkında & Güncelleme`** sekmesi eklendi.
+- **Ana Sayfada Sistem Diski Durumu (`SystemHealthService`)**: Ana Sayfa üst paneline `C:\` boş/toplam kapasite, doluluk çubuğu ve işletim sistemi özeti kartı eklendi.
+- **Program Listesini Dışa Aktarma (`HTML` / `CSV`) & Kurulum Tarihi**: `Program Kaldır` sekmesine **`Listeyi Dışa Aktar`** butonu, `Tarih` (`DD.MM.YYYY`) sütunu, alt kısımda anlık seçili program sayacı ve CLI tarafında `cleansweep export <dosya.html|dosya.csv>` komutu eklendi.
+- **Windows Sistem Geri Yükleme Noktası Oluşturma**: `Geri Al (Karantina)` sekmesine **`Sistem Geri Yükleme Noktası Oluştur`** butonu eklendi.
+- **Klavye Kısayolları**: `Ctrl+F` ile aktif sekmedeki arama kutusuna odaklanma ve `F5` ile aktif sekmeyi anında yenileme desteği eklendi.
+
+---
+
 ## [0.5.0] - 2026-11-26
 
 ### Neden Güncellendi?
