@@ -26,6 +26,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
     private readonly BrowserExtensionService _browserService = new();
     private readonly AutorunService _autorunService = new();
     private readonly JunkCleanerService _junkService = new();
+    private readonly RegistryCleanerService _registryService = new();
     private readonly FileShredderService _shredderService = new();
 
     private List<AppDisplayItem> _allAppItems = [];
@@ -43,6 +44,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
     private QuarantineSession? _selectedQuarantineSession;
     private CommunityRule? _selectedRule;
     private string _junkTotalSummary = "Taramak istediğiniz kategorileri işaretleyip 'Seçili Kategorileri Tara' butonuna basın.";
+    private string _registrySummaryText = "Taramak istediğiniz kayıt defteri kategorilerini seçip 'Seçili Kategorileri Tara' butonuna basın.";
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -50,6 +52,8 @@ public sealed class MainViewModel : INotifyPropertyChanged
     public ObservableCollection<BrowserExtension> BrowserExtensions { get; } = [];
     public ObservableCollection<AutorunEntry> AutorunEntries { get; } = [];
     public ObservableCollection<JunkCategory> JunkCategories { get; } = [];
+    public ObservableCollection<RegistryCleanCategory> RegistryCategories { get; } = [];
+    public ObservableCollection<RegistryIssueItem> RegistryIssues { get; } = [];
     public ObservableCollection<string> ShredTargets { get; } = [];
     public ObservableCollection<WindowsToolItem> WindowsTools { get; } = new(WindowsToolsCatalog.GetAll());
     public ObservableCollection<WindowsToolItem> FilteredWindowsTools { get; } = new(WindowsToolsCatalog.GetAll());
@@ -184,9 +188,16 @@ public sealed class MainViewModel : INotifyPropertyChanged
         set { _junkTotalSummary = value; OnPropertyChanged(); }
     }
 
+    public string RegistrySummaryText
+    {
+        get => _registrySummaryText;
+        set { _registrySummaryText = value; OnPropertyChanged(); }
+    }
+
     public bool HasNoTraces => SavedTraces.Count == 0;
     public bool HasNoQuarantine => QuarantineSessions.Count == 0;
     public bool HasNoExtensions => BrowserExtensions.Count == 0;
+    public bool HasNoRegistryIssues => RegistryIssues.Count == 0;
 
     public string RulesDirectory => _ruleRepository.RulesDirectory;
 
@@ -197,6 +208,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
     public BrowserExtensionService BrowserService => _browserService;
     public AutorunService AutorunService => _autorunService;
     public JunkCleanerService JunkService => _junkService;
+    public RegistryCleanerService RegistryService => _registryService;
     public FileShredderService ShredderService => _shredderService;
 
     public MainViewModel()
@@ -218,6 +230,16 @@ public sealed class MainViewModel : INotifyPropertyChanged
                     RecalculateJunkSummary();
             };
             JunkCategories.Add(cat);
+        }
+
+        foreach (var regCat in RegistryCleanerService.BuildCategories())
+        {
+            regCat.PropertyChanged += (_, e) =>
+            {
+                if (e.PropertyName == nameof(RegistryCleanCategory.IsSelected))
+                    RecalculateRegistrySummary();
+            };
+            RegistryCategories.Add(regCat);
         }
     }
 
@@ -335,6 +357,59 @@ public sealed class MainViewModel : INotifyPropertyChanged
         JunkTotalSummary = count == 0
             ? "Seçili kategori yok (0 B)."
             : $"Seçili ({count} kategori) temizlenebilir alan: {InstalledApp.FormatBytes(total)}";
+    }
+
+    public async Task ScanRegistryAsync()
+    {
+        var selectedCats = RegistryCategories.Where(c => c.IsSelected).ToList();
+        if (selectedCats.Count == 0)
+        {
+            foreach (var c in RegistryCategories) c.FoundCount = 0;
+            RegistryIssues.Clear();
+            OnPropertyChanged(nameof(HasNoRegistryIssues));
+            RegistrySummaryText = "Hiçbir kategori seçili değil. Lütfen taramak için en az bir kutucuğu işaretleyin.";
+            StatusMessage = "Kayıt defteri taraması için seçili kategori yok.";
+            return;
+        }
+
+        IsBusy = true;
+        StatusMessage = $"Kayıt defteri artıkları taranıyor ({selectedCats.Count} kategori)...";
+        try
+        {
+            var issues = await _registryService.ScanAsync(RegistryCategories, onlySelected: true);
+            RegistryIssues.Clear();
+            foreach (var issue in issues)
+            {
+                issue.PropertyChanged += (_, e) =>
+                {
+                    if (e.PropertyName == nameof(RegistryIssueItem.IsSelected))
+                        RecalculateRegistrySummary();
+                };
+                RegistryIssues.Add(issue);
+            }
+            OnPropertyChanged(nameof(HasNoRegistryIssues));
+            RecalculateRegistrySummary();
+            StatusMessage = $"Kayıt defteri taraması tamamlandı: {RegistryIssues.Count} artık kayıt bulundu.";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    public void RecalculateRegistrySummary()
+    {
+        int catCount = RegistryCategories.Count(c => c.IsSelected);
+        if (RegistryIssues.Count == 0)
+        {
+            RegistrySummaryText = catCount == 0
+                ? "Seçili kategori yok."
+                : $"Seçili {catCount} kategori taranmaya hazır veya temiz.";
+            return;
+        }
+
+        int selectedIssues = RegistryIssues.Count(i => i.IsSelected);
+        RegistrySummaryText = $"Toplam {RegistryIssues.Count} artık kayıt bulundu ({selectedIssues} öğe temizlik için seçili).";
     }
 
     public void RefreshAuxiliaryTabs()

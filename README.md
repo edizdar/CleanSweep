@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img alt="Sürüm" src="https://img.shields.io/badge/Sürüm-v0.4.0-3B82F6?style=for-the-badge" />
+  <img alt="Sürüm" src="https://img.shields.io/badge/Sürüm-v0.5.0-3B82F6?style=for-the-badge" />
   <img alt="Platform" src="https://img.shields.io/badge/Platform-Windows%2010%2F11%20(x64)-06B6D4?style=for-the-badge" />
   <img alt=".NET" src="https://img.shields.io/badge/.NET-10.0-512BD4?style=for-the-badge" />
   <img alt="Lisans" src="https://img.shields.io/badge/Lisans-MIT-22C55E?style=for-the-badge" />
@@ -57,11 +57,16 @@ Sistem Geri Yükleme, Disk Yönetimi, Olay Görüntüleyici, Güvenilirlik Geçm
 
 ![Windows Araçları](docs/screenshots/05-windows-araclari.png)
 
+### 6. Kayıt Defteri Temizleyici (Karantina Yedekli)
+Kaldırılmış programlardan geride kalan kırık `Uninstall`, `Run/RunOnce`, `App Paths`, `SharedDLLs`, `MuiCache/AppCompat`, `FirewallRules` ve boş `HKCU\Software` anahtarlarını 7 güvenli kategoride tarar; sistem koruması (`SafetyGuard`) ile Windows anahtarlarına asla dokunmaz ve temizlemeden önce otomatik `.reg` karantina yedeği alır:
+
+![Kayıt Defteri Temizleyici](docs/screenshots/06-kayit-defteri-temizleyici.png)
+
 ---
 
 ## Revo Uninstaller Pro ile Karşılaştırma
 
-| Özellik | Revo Uninstaller Pro | CleanSweep (`v0.4.0`) |
+| Özellik | Revo Uninstaller Pro | CleanSweep (`v0.5.0`) |
 |---|---|---|
 | **Lisans & Kaynak** | Kapalı kaynak / Ücretli | **MIT Lisansı / %100 Açık Kaynak** |
 | **Kullanım Kolaylığı** | Teknik menüler | **Kolay Mod (4 dev kart) + Uzman Modu** |
@@ -107,6 +112,10 @@ cleansweep force-uninstall "BozukProgram" --mode advanced --kill-processes --dry
 # Karantina oturumunu geri yükle
 cleansweep quarantine list
 cleansweep quarantine restore <session-id>
+
+# Kayıt defteri artığı tarama ve önizleme temizliği
+cleansweep registry scan
+cleansweep registry clean --dry-run
 ```
 
 ---
@@ -118,8 +127,8 @@ Her güncellemede sürüm numarası `Directory.Build.props` üzerinden artırıl
 GitHub üzerinde yeni sürüm yayınlamak için etiket (tag) oluşturup göndermeniz yeterlidir; [release.yml](.github/workflows/release.yml) otomatik olarak testleri çalıştırır, `.zip` paketini derler ve `CHANGELOG.md` içindeki ilgili sürüm notlarıyla GitHub Release sayfasını yayınlar:
 
 ```powershell
-git tag v0.4.0
-git push origin v0.4.0
+git tag v0.5.0
+git push origin v0.5.0
 ```
 
 ---

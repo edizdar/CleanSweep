@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Text.Json;
+using CleanSweep.Core.Cleaner;
 using CleanSweep.Core.Discovery;
 using CleanSweep.Core.Models;
 using CleanSweep.Core.Quarantine;
@@ -43,6 +44,7 @@ internal static class Program
                 "force-uninstall" => await HandleForceUninstallAsync(rest, asJson),
                 "trace" => await HandleTraceAsync(rest, asJson),
                 "quarantine" => HandleQuarantine(rest, asJson),
+                "registry" => await HandleRegistryAsync(rest, asJson),
                 "rules" => HandleRules(rest, asJson),
                 _ => UnknownCommand(command)
             };
@@ -430,6 +432,59 @@ internal static class Program
         return 0;
     }
 
+    private static async Task<int> HandleRegistryAsync(string[] args, bool asJson)
+    {
+        string sub = args.Length > 0 ? args[0].ToLowerInvariant() : "scan";
+        var service = new RegistryCleanerService();
+        var categories = RegistryCleanerService.BuildCategories();
+
+        if (HasFlag(args, "--all"))
+        {
+            foreach (var c in categories)
+                c.IsSelected = true;
+        }
+
+        if (sub == "scan")
+        {
+            var issues = await service.ScanAsync(categories, onlySelected: true);
+            if (asJson)
+            {
+                Console.WriteLine(JsonSerializer.Serialize(issues, JsonOptions));
+                return 0;
+            }
+
+            Console.WriteLine($"Toplam {issues.Count} kayıt defteri artığı bulundu:\n");
+            foreach (var issue in issues)
+            {
+                Console.WriteLine($"[{issue.Risk}] [{issue.CategoryId}] {issue.DisplayPath}");
+                Console.WriteLine($"    Sebep: {issue.Reason}");
+            }
+            return 0;
+        }
+
+        if (sub == "clean")
+        {
+            bool dryRun = HasFlag(args, "--dry-run");
+            bool backup = !HasFlag(args, "--no-quarantine");
+            var issues = await service.ScanAsync(categories, onlySelected: true);
+            var res = await service.CleanSelectedAsync(issues, backupToQuarantine: backup, dryRun: dryRun);
+            if (asJson)
+            {
+                Console.WriteLine(JsonSerializer.Serialize(res, JsonOptions));
+            }
+            else
+            {
+                Console.WriteLine(res.Summary);
+                if (!string.IsNullOrEmpty(res.QuarantineSessionId))
+                    Console.WriteLine($"Karantina Oturumu: {res.QuarantineSessionId}");
+            }
+            return res.Success ? 0 : 1;
+        }
+
+        Console.Error.WriteLine("Kullanım: cleansweep registry <scan|clean> [--all] [--dry-run] [--no-quarantine] [--json]");
+        return 2;
+    }
+
     private static InstalledApp? FindTargetApp(IReadOnlyList<InstalledApp> apps, string query)
     {
         return apps.FirstOrDefault(a => a.Name.Equals(query, StringComparison.OrdinalIgnoreCase))
@@ -493,6 +548,8 @@ Kullanım:
   cleansweep quarantine list [--json]
   cleansweep quarantine restore <session-id>
   cleansweep quarantine purge <session-id>
+  cleansweep registry scan [--all] [--json]
+  cleansweep registry clean [--all] [--dry-run] [--no-quarantine] [--json]
   cleansweep rules list [--json]
 """);
     }

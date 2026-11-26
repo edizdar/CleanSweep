@@ -2,6 +2,26 @@
 
 Bu dosya CleanSweep projesinin her sürümünde yapılan değişiklikleri ve neden güncellendiğini belgelemek için tutulur. GitHub'da oluşturulan her yeni Release notu bu dosyadaki ilgili sürüm başlığından otomatik alınır.
 
+## [0.5.0] - 2026-11-26
+
+### Neden Güncellendi?
+Kullanıcı geri bildirimi doğrultusunda program kaldırma dışındaki bağımsız **Kayıt Defteri Temizleyici (Registry Leftover Cleaner)** modülü eklendi; kaldırılmış programlardan kalan kırık kayıt defteri değerleri, eksik başlangıç anahtarları ve yetim önbelleklerin karantina yedeğiyle güvenle temizlenmesi sağlandı.
+
+### Yeni Özellikler
+- **Bağımsız Kayıt Defteri Temizleyici (`PanelRegistry` & `RegistryCleanerService`)**: Hem **Kolay Mod** hem **Uzman Modu**'nda erişilebilir yeni **`Kayıt Defteri Temizle`** sekmesi ve Ana Sayfa hızlı kartı eklendi.
+- **7 Güvenli Tarama Kategorisi**:
+  - Eski Uygulama Önbelleği (`MuiCache & AppCompat`)
+  - Bozuk Kaldırma Kayıtları (`Uninstall`)
+  - Eksik Başlangıç Kayıtları (`Run / RunOnce`)
+  - Kırık Uygulama Kısayolları (`App Paths`)
+  - Kayıp Paylaşılan DLL Referansları (`SharedDLLs`)
+  - Yetim Güvenlik Duvarı Kuralları (`FirewallRules`)
+  - Boş Yazılım Kayıt Anahtarları (`HKCU\Software`)
+- **Tam Güvenlik & Atomik Karantina Kalkanı**: Tüm bulgular `SafetyGuard` kontrolünden ve sıkı yerel dosya/sürücü doğrulamasından geçer (`C:\Windows\*`, `WindowsApps`, UNC ağ yolları ve takılı olmayan sürücüler asla işaretlenmez); temizlenen kayıtlar otomatik `.reg` + JSON yedeğine alınır ve `Geri Al (Karantina)` sekmesinden geri yüklenebilir.
+- **CLI Desteği**: `cleansweep registry scan [--all] [--json]` ve `cleansweep registry clean [--all] [--dry-run] [--no-quarantine]` komutları eklendi.
+
+---
+
 ## [0.4.0] - 2026-11-26
 
 ### Neden Güncellendi?

@@ -67,6 +67,7 @@ public partial class MainWindow : Window
         PanelBrowsers.Visibility = NavBrowsers.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
         PanelAutorun.Visibility = NavAutorun.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
         PanelJunk.Visibility = NavJunk.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
+        PanelRegistry.Visibility = NavRegistry.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
         PanelShredder.Visibility = NavShredder.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
         PanelTools.Visibility = NavTools.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
         PanelMonitor.Visibility = NavMonitor.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
@@ -98,6 +99,11 @@ public partial class MainWindow : Window
     }
 
     private void QuickGoAutorun_Click(object sender, RoutedEventArgs e) => NavAutorun.IsChecked = true;
+    private void QuickGoRegistry_Click(object sender, RoutedEventArgs e)
+    {
+        NavRegistry.IsChecked = true;
+        _vm.RecalculateRegistrySummary();
+    }
     private void QuickGoTools_Click(object sender, RoutedEventArgs e) => NavTools.IsChecked = true;
 
     private void SourceFilter_Checked(object sender, RoutedEventArgs e)
@@ -511,6 +517,70 @@ public partial class MainWindow : Window
         }
     }
 
+    // Registry Leftover Cleaner
+    private void SelectRecommendedRegistry_Click(object sender, RoutedEventArgs e)
+    {
+        foreach (var cat in _vm.RegistryCategories)
+            cat.IsSelected = cat.DefaultSelected;
+        _vm.RecalculateRegistrySummary();
+    }
+
+    private void SelectAllRegistry_Click(object sender, RoutedEventArgs e)
+    {
+        foreach (var cat in _vm.RegistryCategories)
+            cat.IsSelected = true;
+        _vm.RecalculateRegistrySummary();
+    }
+
+    private void ClearRegistrySelection_Click(object sender, RoutedEventArgs e)
+    {
+        foreach (var cat in _vm.RegistryCategories)
+            cat.IsSelected = false;
+        _vm.RecalculateRegistrySummary();
+    }
+
+    private async void ScanRegistry_Click(object sender, RoutedEventArgs e) => await _vm.ScanRegistryAsync();
+
+    private async void CleanRegistry_Click(object sender, RoutedEventArgs e)
+    {
+        var selectedIssues = _vm.RegistryIssues.Where(i => i.IsSelected).ToList();
+        if (selectedIssues.Count == 0)
+        {
+            MessageBox.Show("Lütfen temizlemek için en az bir kayıt defteri artığı seçin.", "Kayıt Defteri Temizleyici", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        bool backup = RegistryBackupCheck.IsChecked == true;
+        string confirmText = backup
+            ? $"Seçili {selectedIssues.Count} kayıt defteri artığı karantina yedeği alınarak temizlensin mi?\nİsterseniz 'Geri Al (Karantina)' sekmesinden geri yükleyebilirsiniz."
+            : $"Seçili {selectedIssues.Count} kayıt defteri artığı karantina yedeği OLMADAN silinsin mi?";
+
+        if (MessageBox.Show(confirmText, "Kayıt Defteri Temizlik Onayı", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+            return;
+
+        _vm.IsBusy = true;
+        _vm.StatusMessage = $"Kayıt defteri artıkları temizleniyor ({selectedIssues.Count} öğe)...";
+        try
+        {
+            var result = await _vm.RegistryService.CleanSelectedAsync(selectedIssues, backupToQuarantine: backup, dryRun: false, quarantineManager: _vm.QuarantineManager);
+            string msg = result.Summary;
+            if (!string.IsNullOrWhiteSpace(result.QuarantineSessionId))
+                msg += $"\n\nKarantina Oturumu: {result.QuarantineSessionId}";
+            if (result.Errors.Count > 0)
+                msg += "\n\nHatalar:\n• " + string.Join("\n• ", result.Errors.Take(5));
+
+            MessageBox.Show(msg, "Kayıt Defteri Temizleyici",
+                MessageBoxButton.OK, result.Success ? MessageBoxImage.Information : MessageBoxImage.Warning);
+
+            await _vm.ScanRegistryAsync();
+            _vm.RefreshAuxiliaryTabs();
+        }
+        finally
+        {
+            _vm.IsBusy = false;
+        }
+    }
+
     // File Shredder
     private void Shredder_DragOver(object sender, DragEventArgs e)
     {
@@ -756,5 +826,9 @@ public partial class MainWindow : Window
 
         NavTools.IsChecked = true;
         await RenderAsync("05-windows-araclari.png");
+
+        NavRegistry.IsChecked = true;
+        await _vm.ScanRegistryAsync();
+        await RenderAsync("06-kayit-defteri-temizleyici.png");
     }
 }
