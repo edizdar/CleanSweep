@@ -1,0 +1,19 @@
+{
+  "id": "steam",
+  "name": "Steam",
+  "publishers": ["Valve Corporation"],
+  "matchNames": ["Steam"],
+  "paths": [
+    "%PROGRAMFILES(X86)%\\Steam",
+    "%LOCALAPPDATA%\\Steam"
+  ],
+  "registryKeys": [
+    "HKCU\\Software\\Valve\\Steam",
+    "HKLM\\SOFTWARE\\WOW6432Node\\Valve\\Steam"
+  ],
+  "services": [
+    "Steam Client Service"
+  ],
+  "scheduledTasks": [],
+  "notes": "Oyun kütüphanesi steamapps klasöründe tutulur; kaldırmadan önce yedeklemek isteyebilirsiniz."
+}

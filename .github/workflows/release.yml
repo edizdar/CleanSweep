@@ -1,0 +1,66 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore & Test
+        run: |
+          dotnet restore CleanSweep.sln
+          dotnet test CleanSweep.sln -c Release --verbosity normal
+
+      - name: Publish GUI & CLI (Single-File win-x64)
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $ver = $tag.TrimStart('v')
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          dotnet publish src/CleanSweep.App/CleanSweep.App.csproj -c Release -r win-x64 -p:SelfContained=false -p:PublishSingleFile=true -p:DebugType=None -p:DebugSymbols=false -p:Version=$ver -o dist/CleanSweep
+          dotnet publish src/CleanSweep.Cli/CleanSweep.Cli.csproj -c Release -r win-x64 -p:SelfContained=false -p:PublishSingleFile=true -p:DebugType=None -p:DebugSymbols=false -p:Version=$ver -o dist/CleanSweep/cli
+          Compress-Archive -Path dist/CleanSweep/* -DestinationPath "dist/CleanSweep-$tag-win-x64.zip" -Force
+
+      - name: Extract Release Notes from CHANGELOG.md
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $ver = $tag.TrimStart('v')
+          $lines = Get-Content CHANGELOG.md -Encoding UTF8
+          $capture = $false
+          $notes = @()
+          foreach ($line in $lines) {
+            if ($line -match "^## \[$([regex]::Escape($ver))\]") {
+              $capture = $true
+              continue
+            }
+            if ($capture -and $line -match "^## \[") {
+              break
+            }
+            if ($capture) {
+              $notes += $line
+            }
+          }
+          if ($notes.Count -eq 0) {
+            $notes = @("CleanSweep $tag sürümü yayınlandı. Detaylar için CHANGELOG.md dosyasına bakın.")
+          }
+          $notes -join "`n" | Set-Content release_notes.md -Encoding UTF8
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: release_notes.md
+          files: dist/CleanSweep-*.zip

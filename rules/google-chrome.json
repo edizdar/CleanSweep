@@ -1,0 +1,22 @@
+{
+  "id": "google-chrome",
+  "name": "Google Chrome",
+  "publishers": ["Google LLC", "Google Inc."],
+  "matchNames": ["Google Chrome"],
+  "paths": [
+    "%PROGRAMFILES%\\Google\\Chrome",
+    "%PROGRAMFILES(X86)%\\Google\\Chrome",
+    "%LOCALAPPDATA%\\Google\\Chrome"
+  ],
+  "registryKeys": [
+    "HKCU\\Software\\Google\\Chrome",
+    "HKLM\\SOFTWARE\\Google\\Chrome",
+    "HKLM\\SOFTWARE\\WOW6432Node\\Google\\Chrome"
+  ],
+  "services": [],
+  "scheduledTasks": [
+    "GoogleUpdateTaskMachineCore",
+    "GoogleUpdateTaskMachineUA"
+  ],
+  "notes": "Google Update görevleri diğer Google ürünleriyle paylaşılabilir; kaldırmadan önce inceleyin."
+}

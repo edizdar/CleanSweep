@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CleanSweep Community Leftover Rule",
+  "type": "object",
+  "required": ["id", "name", "matchNames", "paths", "registryKeys"],
+  "properties": {
+    "id": { "type": "string", "minLength": 2 },
+    "name": { "type": "string", "minLength": 1 },
+    "publishers": { "type": "array", "items": { "type": "string" } },
+    "matchNames": { "type": "array", "items": { "type": "string" } },
+    "paths": { "type": "array", "items": { "type": "string" } },
+    "registryKeys": { "type": "array", "items": { "type": "string" } },
+    "services": { "type": "array", "items": { "type": "string" } },
+    "scheduledTasks": { "type": "array", "items": { "type": "string" } },
+    "notes": { "type": "string" }
+  }
+}

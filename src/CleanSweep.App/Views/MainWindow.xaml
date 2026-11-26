@@ -1,0 +1,773 @@
+<Window x:Class="CleanSweep.App.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="{Binding WindowTitle}"
+        Icon="/Assets/cleansweep.ico"
+        Background="{StaticResource BgPrimaryBrush}"
+        Foreground="{StaticResource TextPrimaryBrush}"
+        Width="1300" Height="840" MinWidth="1060" MinHeight="690"
+        WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="68"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="34"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="248"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Grid.ColumnSpan="2"
+                Background="{StaticResource BgSurfaceBrush}"
+                BorderBrush="{StaticResource BorderBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="20,0">
+            <DockPanel LastChildFill="False">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Left">
+                    <Image Source="/Assets/cleansweep.png" Width="38" Height="38" Margin="0,0,12,0" RenderOptions.BitmapScalingMode="HighQuality"/>
+                    <StackPanel VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="CleanSweep" FontSize="19" FontWeight="Bold"/>
+                            <Border Background="#1D365D" BorderBrush="#3B82F6" BorderThickness="1" CornerRadius="10" Padding="8,2" Margin="8,0,0,0" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding AppVersion}" FontSize="11" FontWeight="Bold" Foreground="#93C5FD"/>
+                            </Border>
+                        </StackPanel>
+                        <TextBlock Text="Kolay, Güvenli ve Açık Kaynak Bilgisayar Temizleyicisi" FontSize="11.5" Foreground="{StaticResource TextSecondaryBrush}"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Right">
+                    <ToggleButton x:Name="ModeToggleBtn"
+                                  IsChecked="{Binding IsExpertMode, Mode=TwoWay}"
+                                  Content="{Binding ModeToggleText}"
+                                  Margin="0,0,10,0"
+                                  ToolTip="Kolay Mod herkes için sade bir arayüz sunar. Uzman Modu gelişmiş geliştirici ve izleme araçlarını açar."/>
+                    <Button Content="Avcı Modu (Ekrandan Seç)" Style="{StaticResource AccentButton}" Click="LaunchHunterMode_Click" Margin="0,0,10,0"
+                            ToolTip="Pencereyi küçültür; masaüstündeki herhangi bir programın üzerine sürükleyip kaldırmanızı sağlar."/>
+                    <Border x:Name="AdminBadge" CornerRadius="14" Padding="12,6" Margin="0,0,8,0" Background="#1E293B" BorderThickness="1" BorderBrush="{StaticResource BorderBrush}">
+                        <TextBlock Text="{Binding AdminStatusText}" FontSize="12" FontWeight="SemiBold"/>
+                    </Border>
+                    <Button x:Name="ElevateButton" Content="Yönetici Olarak Başlat" Click="ElevateButton_Click" Padding="12,6"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- Grouped Sidebar Navigation -->
+        <Border Grid.Row="1" Grid.Column="0"
+                Background="{StaticResource BgSurfaceBrush}"
+                BorderBrush="{StaticResource BorderBrush}"
+                BorderThickness="0,0,1,0"
+                Padding="0,12">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <RadioButton x:Name="NavHome" Style="{StaticResource SidebarNavButton}" IsChecked="True" Checked="NavChanged">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE80F;" FontSize="15" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Ana Sayfa" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </RadioButton>
+
+                    <TextBlock Text="KALDIRMA" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextSecondaryBrush}" Margin="18,14,10,6"/>
+                    <RadioButton x:Name="NavApps" Style="{StaticResource SidebarNavButton}" Checked="NavChanged">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE71D;" FontSize="15" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Program Kaldır" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </RadioButton>
+                    <RadioButton x:Name="NavBrowsers" Style="{StaticResource SidebarNavButton}" Checked="NavChanged">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE774;" FontSize="15" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Tarayıcı Eklentileri" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </RadioButton>
+
+                    <TextBlock Text="TEMİZLİK &amp; HIZ" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextSecondaryBrush}" Margin="18,14,10,6"/>
+                    <RadioButton x:Name="NavAutorun" Style="{StaticResource SidebarNavButton}" Checked="NavChanged">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE7E8;" FontSize="15" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Açılış Programları" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </RadioButton>
+                    <RadioButton x:Name="NavJunk" Style="{StaticResource SidebarNavButton}" Checked="NavChanged">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE74D;" FontSize="15" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Bilgisayarı Temizle" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </RadioButton>
+                    <RadioButton x:Name="NavTools" Style="{StaticResource SidebarNavButton}" Checked="NavChanged">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE90F;" FontSize="15" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Windows Araçları" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </RadioButton>
+
+                    <TextBlock Text="GÜVENLİK &amp; GERİ AL" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextSecondaryBrush}" Margin="18,14,10,6"/>
+                    <RadioButton x:Name="NavQuarantine" Style="{StaticResource SidebarNavButton}" Checked="NavChanged">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE7A7;" FontSize="15" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Geri Al (Karantina)" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </RadioButton>
+
+                    <!-- Expert-only Tabs -->
+                    <StackPanel Visibility="{Binding IsExpertMode, Converter={StaticResource BoolToVis}}">
+                        <TextBlock Text="UZMAN ARAÇLARI" FontSize="11" FontWeight="Bold" Foreground="{StaticResource CyanAccentBrush}" Margin="18,14,10,6"/>
+                        <RadioButton x:Name="NavShredder" Style="{StaticResource SidebarNavButton}" Checked="NavChanged">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE75C;" FontSize="15" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Kalıcı Dosya Öğütücü" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </RadioButton>
+                        <RadioButton x:Name="NavMonitor" Style="{StaticResource SidebarNavButton}" Checked="NavChanged">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE7C4;" FontSize="15" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Kurulum İzleyici &amp; İzler" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </RadioButton>
+                        <RadioButton x:Name="NavRules" Style="{StaticResource SidebarNavButton}" Checked="NavChanged">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8F1;" FontSize="15" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Topluluk Kuralları" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </RadioButton>
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!-- Main Content Area -->
+        <Grid Grid.Row="1" Grid.Column="1" Margin="22">
+
+            <!-- TAB 0: HOME DASHBOARD (Beginner-friendly landing) -->
+            <ScrollViewer x:Name="PanelHome" Visibility="Visible" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <!-- Hero Banner -->
+                    <Border CornerRadius="14" Padding="24" Margin="0,0,0,18" BorderBrush="#2A4A7F" BorderThickness="1">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#14233C" Offset="0"/>
+                                <GradientStop Color="#172B4D" Offset="0.6"/>
+                                <GradientStop Color="#12344D" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <StackPanel>
+                            <TextBlock Text="Ne yapmak istersiniz?" FontSize="24" FontWeight="Bold"/>
+                            <TextBlock Text="Karmaşık ayarlarla uğraşmadan bilgisayarınızdaki gereksiz programları ve çöp dosyaları güvenle temizleyin."
+                                       FontSize="14" Foreground="#CBD5E1" Margin="0,6,0,14"/>
+                            <Border Background="#134E2E" BorderBrush="#22C55E" BorderThickness="1" CornerRadius="14" Padding="12,6" HorizontalAlignment="Left">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xEA18;" Foreground="#4ADE80" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Güvenlik Kalkanı Aktif: Silinen her şey 'Geri Al (Karantina)' bölümünden tek tıkla geri getirilebilir."
+                                               Foreground="#DCFCE7" FontSize="12.5" FontWeight="SemiBold"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 4 Giant Primary Action Cards -->
+                    <UniformGrid Columns="2" Margin="0,0,0,14">
+                        <Button Style="{StaticResource HeroCardButton}" Margin="0,0,12,12" Click="QuickGoApps_Click">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                    <Border Background="#1E3A8A" CornerRadius="10" Width="44" Height="44" Margin="0,0,12,0">
+                                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE71D;" FontSize="22" Foreground="#60A5FA" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Program Kaldır" FontSize="17" FontWeight="Bold"/>
+                                        <TextBlock Text="{Binding TotalAppsCountText}" FontSize="12" Foreground="#60A5FA" FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                </StackPanel>
+                                <TextBlock Text="İstemediğiniz programları tüm gizli kalıntılarıyla birlikte tek adımda temizleyin."
+                                           Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" FontSize="13"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button Style="{StaticResource HeroCardButton}" Margin="0,0,0,12" Click="QuickGoJunk_Click">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                    <Border Background="#14532D" CornerRadius="10" Width="44" Height="44" Margin="0,0,12,0">
+                                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE74D;" FontSize="22" Foreground="#4ADE80" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Bilgisayarı Temizle" FontSize="17" FontWeight="Bold"/>
+                                        <TextBlock Text="Gereksiz dosyalar &amp; önbellek" FontSize="12" Foreground="#4ADE80" FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                </StackPanel>
+                                <TextBlock Text="Geçici dosyaları, tarayıcı önbelleğini ve çöp kutusunu temizleyerek diskte yer açın."
+                                           Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" FontSize="13"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button Style="{StaticResource HeroCardButton}" Margin="0,0,12,0" Click="QuickGoAutorun_Click">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                    <Border Background="#78350F" CornerRadius="10" Width="44" Height="44" Margin="0,0,12,0">
+                                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE7E8;" FontSize="22" Foreground="#FBBF24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Açılışı Hızlandır" FontSize="17" FontWeight="Bold"/>
+                                        <TextBlock Text="Bilgisayar açılırken açılanlar" FontSize="12" Foreground="#FBBF24" FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                </StackPanel>
+                                <TextBlock Text="Bilgisayar açılırken otomatik çalışıp sistemi yavaşlatan programları kolayca kapatın."
+                                           Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" FontSize="13"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button Style="{StaticResource HeroCardButton}" Click="LaunchHunterMode_Click">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                    <Border Background="#164E63" CornerRadius="10" Width="44" Height="44" Margin="0,0,12,0">
+                                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE81D;" FontSize="22" Foreground="#22D3EE" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Ekrandan Seçip Kaldır" FontSize="17" FontWeight="Bold"/>
+                                        <TextBlock Text="Avcı Modu (Nişangah)" FontSize="12" Foreground="#22D3EE" FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                </StackPanel>
+                                <TextBlock Text="Adını bilmediğiniz bir pencerenin veya kısayolun üzerine hedefi sürükleyip hemen kaldırın."
+                                           Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" FontSize="13"/>
+                            </StackPanel>
+                        </Button>
+                    </UniformGrid>
+
+                    <!-- 2 Secondary Quick Cards -->
+                    <UniformGrid Columns="2">
+                        <Button Style="{StaticResource HeroCardButton}" Margin="0,0,12,0" Click="ForcedUninstall_Click">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE7BA;" FontSize="22" Foreground="#F87171" Margin="0,0,12,0" VerticalAlignment="Center"/>
+                                <StackPanel>
+                                    <TextBlock Text="Silinmeyen Programı Zorla Kaldır" FontSize="14.5" FontWeight="Bold"/>
+                                    <TextBlock Text="Normal yolla silinmeyen veya bozulmuş programları kökten temizleyin." FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Button>
+
+                        <Button Style="{StaticResource HeroCardButton}" Click="QuickGoTools_Click">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE90F;" FontSize="22" Foreground="#A78BFA" Margin="0,0,12,0" VerticalAlignment="Center"/>
+                                <StackPanel>
+                                    <TextBlock Text="Windows Araçları" FontSize="14.5" FontWeight="Bold"/>
+                                    <TextBlock Text="Sistem Geri Yükleme, Disk Temizleme, Görev Yöneticisi vb. 15 araç." FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Button>
+                    </UniformGrid>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- TAB 1: Program Uninstaller -->
+            <Grid x:Name="PanelApps" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <DockPanel Grid.Row="0" Margin="0,0,0,10">
+                    <Grid Width="360" DockPanel.Dock="Left">
+                        <TextBox x:Name="SearchBox" Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="Kaldırmak istediğiniz programın adını yazın..." IsHitTestVisible="False" VerticalAlignment="Center" Margin="14,0,0,0"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   Visibility="{Binding Text.IsEmpty, ElementName=SearchBox, Converter={StaticResource BoolToVis}}"/>
+                    </Grid>
+                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" HorizontalAlignment="Right">
+                        <Button Content="Listeyi Yenile" Click="RefreshApps_Click"/>
+                    </StackPanel>
+                </DockPanel>
+
+                <!-- Filter Chips (Visible in Expert Mode, optional in Easy Mode) -->
+                <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,10"
+                            Visibility="{Binding IsExpertMode, Converter={StaticResource BoolToVis}}">
+                    <RadioButton Content="Tümü" Style="{StaticResource FilterChip}" IsChecked="True" Tag="All" Checked="SourceFilter_Checked"/>
+                    <RadioButton Content="Win32 / MSI" Style="{StaticResource FilterChip}" Tag="Win32" Checked="SourceFilter_Checked"/>
+                    <RadioButton Content="MSIX / Store" Style="{StaticResource FilterChip}" Tag="Msix" Checked="SourceFilter_Checked"/>
+                    <RadioButton Content="Scoop" Style="{StaticResource FilterChip}" Tag="Scoop" Checked="SourceFilter_Checked"/>
+                    <RadioButton Content="Chocolatey" Style="{StaticResource FilterChip}" Tag="Chocolatey" Checked="SourceFilter_Checked"/>
+                </StackPanel>
+
+                <DataGrid x:Name="AppsGrid"
+                          Grid.Row="2"
+                          ItemsSource="{Binding FilteredApps}"
+                          SelectedItem="{Binding SelectedApp}"
+                          SelectionMode="Extended"
+                          IsReadOnly="True">
+                    <DataGrid.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Programı Kaldır &amp; Kalıntı Temizle" Click="UninstallAndScan_Click"/>
+                            <MenuItem Header="Silinmiyorsa Zorla Kaldır" Click="ForcedUninstall_Click"/>
+                            <MenuItem Header="Kalıntılarını İncele (Silmeden)" Click="PreviewScan_Click"/>
+                            <Separator/>
+                            <MenuItem Header="Kurulum Klasörünü Aç" Click="OpenAppInstallDir_Click"/>
+                            <MenuItem Header="Kayıt Defteri Yolunu Kopyala" Click="CopyAppRegPath_Click"/>
+                        </ContextMenu>
+                    </DataGrid.ContextMenu>
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="Seç" Width="46">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                              HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="Program Adı" Width="2.2*" MinWidth="220" SortMemberPath="Name">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Image Source="{Binding Icon}" Width="20" Height="20" Margin="0,0,10,0" RenderOptions.BitmapScalingMode="HighQuality"/>
+                                        <TextBlock Text="{Binding Name}" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="Üretici / Yayıncı" Binding="{Binding Publisher}" ElementStyle="{StaticResource GridCellTextStyle}" Width="1.2*" MinWidth="120"/>
+                        <DataGridTextColumn Header="Sürüm" Binding="{Binding Version}" ElementStyle="{StaticResource GridCellTextStyle}" Width="100"/>
+                        <DataGridTextColumn Header="Boyut" Binding="{Binding FormattedSize}" ElementStyle="{StaticResource GridCellTextStyle}" Width="85"/>
+                        <DataGridTemplateColumn Header="İşlem" Width="96">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button Content="Kaldır"
+                                            Style="{StaticResource AccentButton}"
+                                            Padding="12,4"
+                                            FontSize="12"
+                                            Click="RowUninstall_Click"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <!-- Expert Details Footer -->
+                <Border Grid.Row="3" Margin="0,10,0,0" Padding="10,8" Background="{StaticResource BgCardBrush}" CornerRadius="8" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                        Visibility="{Binding IsExpertMode, Converter={StaticResource BoolToVis}}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="{Binding SelectedApp.InstallLocation, StringFormat='Kurulum Yolu: {0}', TargetNullValue='Kurulum Yolu: -'}"
+                                   Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" TextTrimming="CharacterEllipsis" Margin="0,0,12,0"/>
+                        <TextBlock Grid.Column="1" Text="{Binding SelectedApp.RegistryKeyPath, StringFormat='Kayıt Defteri: {0}', TargetNullValue='Kayıt Defteri: -'}"
+                                   Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" TextTrimming="CharacterEllipsis"/>
+                    </Grid>
+                </Border>
+
+                <Border Grid.Row="4" Margin="0,10,0,0" Padding="12" Background="{StaticResource BgSurfaceBrush}" CornerRadius="10" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                    <DockPanel LastChildFill="False">
+                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                            <Button Content="Programı Kaldır" Style="{StaticResource AccentButton}" Click="UninstallAndScan_Click" Margin="0,0,8,0"/>
+                            <Button Content="Seçilenleri Toplu Kaldır" Style="{StaticResource SafeActionButton}" Click="BatchQuietUninstall_Click" Margin="0,0,8,0"
+                                    ToolTip="Kutucuğunu işaretlediğiniz tüm programları sırayla kaldırır ve tüm dosya + kayıt defteri artıklarını topluca tarar."/>
+                            <Button Content="Silinmiyorsa Zorla Kaldır" Style="{StaticResource DangerButton}" Click="ForcedUninstall_Click" Margin="0,0,8,0"/>
+                            <Button Content="Seçimi Temizle" Click="ClearAppChecks_Click" Margin="0,0,8,0"/>
+                            <Button Content="Sadece Kalıntı Tara" Click="PreviewScan_Click"
+                                    Visibility="{Binding IsExpertMode, Converter={StaticResource BoolToVis}}"/>
+                        </StackPanel>
+                        <TextBlock Text="Tekli kaldırmak için satırdaki 'Kaldır'a, toplu kaldırmak için kutucuklara tıklayın" VerticalAlignment="Center" DockPanel.Dock="Right" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                    </DockPanel>
+                </Border>
+            </Grid>
+
+            <!-- TAB 2: Browser Extensions -->
+            <Grid x:Name="PanelBrowsers" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Text="Tarayıcı Eklentileri" FontSize="20" FontWeight="Bold"/>
+                <Border Grid.Row="1" Background="{StaticResource BgCardBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="10" Padding="14" Margin="0,10,0,12">
+                    <DockPanel LastChildFill="False">
+                        <TextBlock Text="Chrome, Edge, Brave, Opera, Vivaldi ve Firefox'a gizlice eklenmiş olabilecek istenmeyen eklentileri görüp tek tıkla kaldırın."
+                                   Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" TextWrapping="Wrap" MaxWidth="680" DockPanel.Dock="Left"/>
+                        <Button Content="Eklentileri Tara" Style="{StaticResource AccentButton}" Click="ScanBrowsers_Click" DockPanel.Dock="Right"/>
+                    </DockPanel>
+                </Border>
+
+                <Grid Grid.Row="2">
+                    <DataGrid x:Name="BrowsersGrid" ItemsSource="{Binding BrowserExtensions}" IsReadOnly="True" SelectionMode="Single">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Tarayıcı" Binding="{Binding Browser}" ElementStyle="{StaticResource GridCellTextStyle}" Width="140"/>
+                            <DataGridTextColumn Header="Profil" Binding="{Binding ProfileName}" ElementStyle="{StaticResource GridCellTextStyle}" Width="100"/>
+                            <DataGridTextColumn Header="Eklenti Adı" Binding="{Binding Name}" ElementStyle="{StaticResource GridCellTextStyle}" Width="1.6*"/>
+                            <DataGridTextColumn Header="Sürüm" Binding="{Binding Version}" ElementStyle="{StaticResource GridCellTextStyle}" Width="90"/>
+                            <DataGridTextColumn Header="Açıklama" Binding="{Binding Description}" ElementStyle="{StaticResource GridCellTextStyle}" Width="2*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <TextBlock Text="Tarayıcı eklentisi bulunamadı veya henüz tarama yapılmadı."
+                               HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}"
+                               Visibility="{Binding HasNoExtensions, Converter={StaticResource BoolToVis}}"/>
+                </Grid>
+
+                <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,12,0,0">
+                    <Button Content="Seçili Eklentiyi Kaldır" Style="{StaticResource DangerButton}" Click="RemoveExtension_Click" Margin="0,0,8,0"/>
+                    <Button Content="Eklenti Klasörünü Aç" Click="OpenExtensionFolder_Click"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- TAB 3: Autorun / Startup Manager -->
+            <Grid x:Name="PanelAutorun" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Text="Açılış Programları (Bilgisayarı Hızlandır)" FontSize="20" FontWeight="Bold"/>
+                <Border Grid.Row="1" Background="{StaticResource BgCardBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="10" Padding="14" Margin="0,10,0,12">
+                    <DockPanel LastChildFill="False">
+                        <TextBlock Text="Bilgisayar açıldığında otomatik başlayan programları kapatarak açılış süresini hızlandırabilirsiniz. İstediğiniz zaman tekrar açabilirsiniz."
+                                   Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" TextWrapping="Wrap" MaxWidth="700" DockPanel.Dock="Left"/>
+                        <Button Content="Listeyi Yenile" Click="RefreshAutorun_Click" DockPanel.Dock="Right"/>
+                    </DockPanel>
+                </Border>
+
+                <DataGrid x:Name="AutorunGrid" Grid.Row="2" ItemsSource="{Binding AutorunEntries}" IsReadOnly="True" SelectionMode="Single"
+                          MouseDoubleClick="AutorunGrid_MouseDoubleClick">
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="Durum (Aç / Kapat)" Width="135">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ToggleButton Style="{StaticResource ModernSwitchToggle}"
+                                                  IsChecked="{Binding IsEnabled, Mode=OneWay}"
+                                                  Click="AutorunSwitch_Click"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="Program Adı" Binding="{Binding Name}" ElementStyle="{StaticResource GridCellTextStyle}" Width="1.2*"/>
+                        <DataGridTextColumn Header="Konum" Binding="{Binding Location}" ElementStyle="{StaticResource GridCellTextStyle}" Width="1.3*"/>
+                        <DataGridTextColumn Header="Başlatma Yolu" Binding="{Binding Command}" ElementStyle="{StaticResource GridCellTextStyle}" Width="2.1*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <DockPanel Grid.Row="3" Margin="0,12,0,0" LastChildFill="False">
+                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                        <Button Content="Açılışta Çalıştır (Aç)" Style="{StaticResource SafeActionButton}" Click="EnableAutorun_Click" Margin="0,0,8,0"/>
+                        <Button Content="Açılışta Durdur (Kapat)" Click="DisableAutorun_Click" Margin="0,0,8,0"/>
+                        <Button Content="Listeden Sil" Style="{StaticResource DangerButton}" Click="DeleteAutorun_Click" Margin="0,0,8,0"
+                                Visibility="{Binding IsExpertMode, Converter={StaticResource BoolToVis}}"/>
+                        <Button Content="Klasörü Aç" Click="OpenAutorunLocation_Click"/>
+                    </StackPanel>
+                    <TextBlock Text="Açmak/kapatmak için anahtara tıklayın veya satıra çift tıklayın"
+                               VerticalAlignment="Center" DockPanel.Dock="Right"
+                               Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                </DockPanel>
+            </Grid>
+
+            <!-- TAB 4: Junk Files Cleaner -->
+            <Grid x:Name="PanelJunk" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Text="Bilgisayarı Temizle (Gereksiz Dosyalar)" FontSize="20" FontWeight="Bold"/>
+                <Border Grid.Row="1" Background="{StaticResource BgCardBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="10" Padding="14" Margin="0,10,0,10">
+                    <DockPanel LastChildFill="False">
+                        <StackPanel DockPanel.Dock="Left">
+                            <TextBlock Text="Yalnızca işaretlediğiniz kategoriler taranır ve temizlenir. Fotoğraflarınıza, belgelerinize ve parolalarınıza dokunulmaz."
+                                       Foreground="{StaticResource TextSecondaryBrush}"/>
+                            <TextBlock Text="{Binding JunkTotalSummary}" FontWeight="SemiBold" Foreground="{StaticResource SafeBrush}" Margin="0,4,0,0"/>
+                        </StackPanel>
+                        <Button Content="Seçili Kategorileri Tara" Style="{StaticResource AccentButton}" Click="ScanJunk_Click" DockPanel.Dock="Right"/>
+                    </DockPanel>
+                </Border>
+
+                <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,0,0,10">
+                    <Button Content="Önerilenleri Seç" Click="SelectRecommendedJunk_Click" Margin="0,0,8,0"/>
+                    <Button Content="Tümünü Seç" Click="SelectAllJunk_Click" Margin="0,0,8,0"/>
+                    <Button Content="Seçimi Temizle" Click="ClearJunkSelection_Click"/>
+                </StackPanel>
+
+                <DataGrid x:Name="JunkGrid" Grid.Row="3" ItemsSource="{Binding JunkCategories}">
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="Seç" Width="50">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                              HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="Grup" Binding="{Binding Group}" ElementStyle="{StaticResource GridCellTextStyle}" Width="100" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Kategori" Binding="{Binding Name}" ElementStyle="{StaticResource GridCellTextStyle}" Width="1.5*" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Açıklama" Binding="{Binding Description}" ElementStyle="{StaticResource GridCellTextStyle}" Width="2*" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Dosya" Binding="{Binding FileCount}" ElementStyle="{StaticResource GridCellTextStyle}" Width="85" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Boyut" Binding="{Binding FormattedSize}" ElementStyle="{StaticResource GridCellTextStyle}" Width="95" IsReadOnly="True"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <StackPanel Grid.Row="4" Orientation="Horizontal" Margin="0,12,0,0">
+                    <Button Content="Seçili Çöpleri Güvenle Temizle" Style="{StaticResource SafeActionButton}" Click="CleanJunk_Click"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- TAB 5: Windows Tools (Revo Windows Tools style!) -->
+            <Grid x:Name="PanelTools" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Text="Windows Sistem Araçları" FontSize="20" FontWeight="Bold"/>
+                <Border Grid.Row="1" Background="{StaticResource BgCardBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="10" Padding="14" Margin="0,10,0,12">
+                    <TextBlock Text="Windows'un içinde bulunan ancak bulması zor olan faydalı bakım, temizlik ve onarım araçlarına tek tıkla ulaşın."
+                               Foreground="{StaticResource TextSecondaryBrush}"/>
+                </Border>
+
+                <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding WindowsTools}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="3"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Style="{StaticResource HeroCardButton}" Margin="0,0,10,10" Padding="14" Click="LaunchWindowsTool_Click">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Border Background="#1D365D" CornerRadius="8" Width="40" Height="40" Margin="0,0,12,0" VerticalAlignment="Top">
+                                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="{Binding IconGlyph}" FontSize="19" Foreground="#60A5FA" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <StackPanel Width="200">
+                                            <TextBlock Text="{Binding Title}" FontSize="14" FontWeight="Bold" Margin="0,0,0,4"/>
+                                            <TextBlock Text="{Binding Description}" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
+
+            <!-- TAB 6: Quarantine & Rollback -->
+            <Grid x:Name="PanelQuarantine" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="160"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Text="Geri Al (Karantina Yedekleri)" FontSize="20" FontWeight="Bold"/>
+                <Border Grid.Row="1" Background="{StaticResource BgCardBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="10" Padding="14" Margin="0,10,0,10">
+                    <DockPanel LastChildFill="False">
+                        <TextBlock Text="CleanSweep ile sildiğiniz her dosya ve ayar burada güvenle saklanır. Bir program eksik çalışırsa seçip 'Eski Haline Geri Yükle'ye basmanız yeterlidir."
+                                   Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" TextWrapping="Wrap" MaxWidth="720" DockPanel.Dock="Left"/>
+                        <Button Content="Yenile" Click="RefreshAux_Click" DockPanel.Dock="Right"/>
+                    </DockPanel>
+                </Border>
+
+                <Grid Grid.Row="2" Margin="0,0,0,10">
+                    <DataGrid x:Name="QuarantineGrid" ItemsSource="{Binding QuarantineSessions}" SelectedItem="{Binding SelectedQuarantineSession}" IsReadOnly="True" SelectionMode="Single">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Oturum ID" Binding="{Binding SessionId}" ElementStyle="{StaticResource GridCellTextStyle}" Width="240"/>
+                            <DataGridTextColumn Header="Program" Binding="{Binding AppName}" ElementStyle="{StaticResource GridCellTextStyle}" Width="1.5*"/>
+                            <DataGridTextColumn Header="Tarih" Binding="{Binding CreatedAt.LocalDateTime}" ElementStyle="{StaticResource GridCellTextStyle}" Width="160"/>
+                            <DataGridTextColumn Header="Öğe" Binding="{Binding TotalItemCount}" ElementStyle="{StaticResource GridCellTextStyle}" Width="80"/>
+                            <DataGridTextColumn Header="Boyut" Binding="{Binding FormattedSize}" ElementStyle="{StaticResource GridCellTextStyle}" Width="100"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <TextBlock Text="Henüz karantina yedeği yok. Bir temizlik yaptığınızda yedekler otomatik burada görünür."
+                               HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}"
+                               Visibility="{Binding HasNoQuarantine, Converter={StaticResource BoolToVis}}"/>
+                </Grid>
+
+                <GroupBox Grid.Row="3" Header="Seçili Yedeğin İçeriği" BorderBrush="{StaticResource BorderBrush}" Foreground="{StaticResource TextSecondaryBrush}" Padding="6">
+                    <ListBox ItemsSource="{Binding SelectedQuarantineDetails}" BorderThickness="0" FontFamily="Consolas" FontSize="12"/>
+                </GroupBox>
+
+                <StackPanel Grid.Row="4" Orientation="Horizontal" Margin="0,10,0,0">
+                    <Button Content="Eski Haline Geri Yükle" Style="{StaticResource SafeActionButton}" Click="RestoreQuarantine_Click" Margin="0,0,8,0"/>
+                    <Button Content="Yedek Klasörünü Aç" Click="OpenQuarantineFolder_Click" Margin="0,0,8,0"/>
+                    <Button Content="Kalıcı Olarak Sil" Style="{StaticResource DangerButton}" Click="PurgeQuarantine_Click"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- TAB 7 (Expert): Unrecoverable File Shredder -->
+            <Grid x:Name="PanelShredder" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Text="Kalıcı Dosya Öğütücü (File Shredder)" FontSize="20" FontWeight="Bold"/>
+                <Border Grid.Row="1" Background="#3B1518" BorderBrush="{StaticResource CautionBrush}" BorderThickness="1" CornerRadius="10" Padding="12" Margin="0,10,0,12">
+                    <TextBlock Text="DİKKAT: Buradan yok edilen dosya ve klasörler kurtarılamaz şekilde silinir. Sistem yolları SafetyGuard tarafından korunur."
+                               TextWrapping="Wrap"/>
+                </Border>
+
+                <Border Grid.Row="2" Background="{StaticResource BgSurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="10" Padding="14"
+                        AllowDrop="True" Drop="Shredder_Drop" DragOver="Shredder_DragOver">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Dosya veya klasörleri buraya sürükleyip bırakın ya da aşağıdaki butonlarla ekleyin:"
+                                   Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,8"/>
+                        <ListBox x:Name="ShredList" Grid.Row="1" ItemsSource="{Binding ShredTargets}" BorderThickness="0"/>
+                    </Grid>
+                </Border>
+
+                <DockPanel Grid.Row="3" Margin="0,12,0,0" LastChildFill="False">
+                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                        <Button Content="Dosya Ekle..." Click="AddShredFile_Click" Margin="0,0,8,0"/>
+                        <Button Content="Klasör Ekle..." Click="AddShredFolder_Click" Margin="0,0,8,0"/>
+                        <Button Content="Listeyi Temizle" Click="ClearShredList_Click"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                        <TextBlock Text="Güvenlik Seviyesi:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <ComboBox x:Name="ShredModeCombo" SelectedIndex="1" Width="170" Margin="0,0,10,0">
+                            <ComboBoxItem Content="1 Geçiş (Hızlı)" Tag="1"/>
+                            <ComboBoxItem Content="3 Geçiş (DoD Güvenli)" Tag="3"/>
+                            <ComboBoxItem Content="7 Geçiş (Maksimum)" Tag="7"/>
+                        </ComboBox>
+                        <Button Content="Kalıcı Olarak Yok Et" Style="{StaticResource DangerButton}" Click="ExecuteShred_Click"/>
+                    </StackPanel>
+                </DockPanel>
+            </Grid>
+
+            <!-- TAB 8 (Expert): Driverless Install Monitor + Saved Traces -->
+            <Grid x:Name="PanelMonitor" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="180"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Text="Sürücüsüz Kurulum İzleyici &amp; Kayıtlı İzler" FontSize="20" FontWeight="Bold"/>
+                <Border Grid.Row="1" Background="{StaticResource BgSurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="10" Padding="14" Margin="0,8,0,10">
+                    <StackPanel>
+                        <TextBlock Text="1) Kurulum dosyasını seçip 'İzlemeyi Başlat'a tıklayın. 2) Programı kurun. 3) 'İzlemeyi Bitir' dediğinizde oluşturulan tüm dosya ve kayıtlar kaydedilir."
+                                   Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,0,0,10"/>
+                        <Grid Margin="0,0,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="110"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="150"/>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="İzleme Adı:" VerticalAlignment="Center"/>
+                            <TextBox Grid.Column="1" Text="{Binding TraceName, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,12,0"/>
+                            <TextBlock Text="Kurulum (.exe/.msi):" VerticalAlignment="Center"/>
+                            <TextBox Grid.Column="3" Text="{Binding InstallerPath, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,8,0"/>
+                            <Button Grid.Column="4" Content="Gözat..." Click="BrowseInstaller_Click"/>
+                        </Grid>
+                        <StackPanel Orientation="Horizontal">
+                            <Button x:Name="StartMonitorBtn" Content="1. İzlemeyi Başlat" Style="{StaticResource AccentButton}" Click="StartMonitoring_Click" Margin="0,0,8,0"/>
+                            <Button x:Name="StopMonitorBtn" Content="2. İzlemeyi Bitir &amp; Farkı Kaydet" IsEnabled="False" Click="StopMonitoring_Click"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <GroupBox Grid.Row="2" Header="Canlı Kurulum Olay Akışı" BorderBrush="{StaticResource BorderBrush}" Foreground="{StaticResource TextSecondaryBrush}" Padding="6" Margin="0,0,0,10">
+                    <ListBox ItemsSource="{Binding LiveTraceEvents}" Foreground="{StaticResource SafeBrush}" BorderThickness="0" FontFamily="Consolas" FontSize="12"/>
+                </GroupBox>
+
+                <Grid Grid.Row="3">
+                    <DataGrid x:Name="TracesGrid" ItemsSource="{Binding SavedTraces}" IsReadOnly="True" SelectionMode="Single">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="İz ID" Binding="{Binding TraceId}" ElementStyle="{StaticResource GridCellTextStyle}" Width="120"/>
+                            <DataGridTextColumn Header="Uygulama / İz Adı" Binding="{Binding TraceName}" ElementStyle="{StaticResource GridCellTextStyle}" Width="2*"/>
+                            <DataGridTextColumn Header="Tarih" Binding="{Binding CompletedAt.LocalDateTime}" ElementStyle="{StaticResource GridCellTextStyle}" Width="160"/>
+                            <DataGridTextColumn Header="Değişiklik" Binding="{Binding TotalChanges}" ElementStyle="{StaticResource GridCellTextStyle}" Width="100"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <TextBlock Text="Henüz kayıtlı kurulum izi yok."
+                               HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}"
+                               Visibility="{Binding HasNoTraces, Converter={StaticResource BoolToVis}}"/>
+                </Grid>
+
+                <StackPanel Grid.Row="4" Orientation="Horizontal" Margin="0,10,0,0">
+                    <Button Content="İzden Cerrahi Kaldır" Style="{StaticResource AccentButton}" Click="UninstallFromTrace_Click" Margin="0,0,8,0"/>
+                    <Button Content="Seçili İzi Sil" Style="{StaticResource DangerButton}" Click="DeleteTrace_Click"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- TAB 9 (Expert): Community Rules -->
+            <Grid x:Name="PanelRules" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Text="Açık Kaynak Topluluk Kuralları (rules/*.json)" FontSize="20" FontWeight="Bold"/>
+                <Border Grid.Row="1" Background="{StaticResource BgCardBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="10" Padding="14" Margin="0,10,0,12">
+                    <DockPanel LastChildFill="False">
+                        <TextBlock Text="Her uygulama için bilinen gizli kalıntı yollarını tanımlayan şeffaf JSON kurallarıdır."
+                                   Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" TextWrapping="Wrap" MaxWidth="680" DockPanel.Dock="Left"/>
+                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                            <Button Content="Klasörü Aç" Click="OpenRulesFolder_Click" Margin="0,0,8,0"/>
+                            <Button Content="Yenile" Click="RefreshAux_Click"/>
+                        </StackPanel>
+                    </DockPanel>
+                </Border>
+
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1.2*"/>
+                        <ColumnDefinition Width="12"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <DataGrid x:Name="RulesGrid" Grid.Column="0" ItemsSource="{Binding CommunityRules}" SelectedItem="{Binding SelectedRule}" IsReadOnly="True" SelectionMode="Single">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="ID" Binding="{Binding Id}" ElementStyle="{StaticResource GridCellTextStyle}" Width="110"/>
+                            <DataGridTextColumn Header="Uygulama" Binding="{Binding Name}" ElementStyle="{StaticResource GridCellTextStyle}" Width="1.4*"/>
+                            <DataGridTextColumn Header="Yol" Binding="{Binding Paths.Count}" ElementStyle="{StaticResource GridCellTextStyle}" Width="60"/>
+                            <DataGridTextColumn Header="Registry" Binding="{Binding RegistryKeys.Count}" ElementStyle="{StaticResource GridCellTextStyle}" Width="75"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <GroupBox Grid.Column="2" Header="Kural Ayrıntıları" BorderBrush="{StaticResource BorderBrush}" Foreground="{StaticResource TextSecondaryBrush}" Padding="6">
+                        <ListBox ItemsSource="{Binding SelectedRuleDetails}" BorderThickness="0" FontFamily="Consolas" FontSize="12"/>
+                    </GroupBox>
+                </Grid>
+
+                <DockPanel Grid.Row="3" Margin="0,12,0,0" LastChildFill="False">
+                    <Button Content="Bu Kuralı Sistemimde Tara" Style="{StaticResource AccentButton}" Click="ScanSelectedRule_Click" DockPanel.Dock="Left"/>
+                    <TextBlock DockPanel.Dock="Right" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}"
+                               Text="{Binding RulesDirectory, StringFormat='Kural Dizini: {0}'}"/>
+                </DockPanel>
+            </Grid>
+        </Grid>
+
+        <!-- Status Bar -->
+        <Border Grid.Row="2" Grid.ColumnSpan="2"
+                Background="{StaticResource BgSurfaceBrush}"
+                BorderBrush="{StaticResource BorderBrush}"
+                BorderThickness="0,1,0,0"
+                Padding="16,0">
+            <DockPanel LastChildFill="False">
+                <TextBlock Text="{Binding StatusMessage}" VerticalAlignment="Center" DockPanel.Dock="Left" Foreground="{StaticResource TextSecondaryBrush}"/>
+                <ProgressBar IsIndeterminate="{Binding IsBusy}"
+                             Width="160" Height="8"
+                             VerticalAlignment="Center"
+                             DockPanel.Dock="Right"
+                             Visibility="{Binding IsBusy, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}"/>
+            </DockPanel>
+        </Border>
+    </Grid>
+</Window>

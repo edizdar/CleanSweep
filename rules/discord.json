@@ -1,0 +1,17 @@
+{
+  "id": "discord",
+  "name": "Discord",
+  "publishers": ["Discord Inc."],
+  "matchNames": ["Discord", "Discord PTB", "Discord Canary"],
+  "paths": [
+    "%LOCALAPPDATA%\\Discord",
+    "%APPDATA%\\discord",
+    "%LOCALAPPDATA%\\SquirrelTemp"
+  ],
+  "registryKeys": [
+    "HKCU\\Software\\Discord"
+  ],
+  "services": [],
+  "scheduledTasks": [],
+  "notes": "Discord Squirrel tabanlıdır ve AppData/LocalAppData içinde önbellek ile otomatik güncelleme kalıntıları bırakır."
+}

@@ -1,0 +1,18 @@
+{
+  "id": "obs-studio",
+  "name": "OBS Studio",
+  "publishers": ["OBS Project"],
+  "matchNames": ["OBS Studio"],
+  "paths": [
+    "%PROGRAMFILES%\\obs-studio",
+    "%APPDATA%\\obs-studio",
+    "%PROGRAMDATA%\\obs-studio-hook"
+  ],
+  "registryKeys": [
+    "HKLM\\SOFTWARE\\OBS Studio",
+    "HKCU\\Software\\OBS Studio"
+  ],
+  "services": [],
+  "scheduledTasks": [],
+  "notes": "Sahneler, profiller ve eklentiler %APPDATA%\\obs-studio içinde saklanır."
+}

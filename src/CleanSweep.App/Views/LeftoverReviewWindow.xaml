@@ -1,0 +1,116 @@
+<Window x:Class="CleanSweep.App.Views.LeftoverReviewWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Kalıntı İnceleme ve Temizleme"
+        Icon="/Assets/cleansweep.ico"
+        Background="{StaticResource BgPrimaryBrush}"
+        Foreground="{StaticResource TextPrimaryBrush}"
+        Width="1140" Height="710" MinWidth="880" MinHeight="540"
+        WindowStartupLocation="CenterOwner">
+    <Grid Margin="18">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,12">
+            <TextBlock x:Name="TitleText" FontSize="20" FontWeight="Bold"/>
+            <Border x:Name="ForcedBanner" Visibility="Collapsed" Background="#3B1518" BorderBrush="{StaticResource CautionBrush}" BorderThickness="1" CornerRadius="8" Padding="10,6" Margin="0,6,0,0">
+                <TextBlock Text="ZORLA KALDIRMA MODU: Bozuk kaldırıcı atlandı; kilitli süreçler sonlandırılarak tüm artıklar temizlenecek."
+                           FontSize="12.5" FontWeight="SemiBold"/>
+            </Border>
+            <TextBlock x:Name="WarningText" Foreground="{StaticResource ModerateBrush}" FontSize="12" Margin="0,4,0,0" TextWrapping="Wrap"/>
+        </StackPanel>
+
+        <!-- KPI Summary -->
+        <UniformGrid Grid.Row="1" Columns="5" Margin="0,0,0,12">
+            <Border Background="{StaticResource BgCardBrush}" CornerRadius="10" Padding="12" Margin="0,0,8,0" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="Toplam Bulgu" FontSize="11.5" Foreground="{StaticResource TextSecondaryBrush}"/>
+                    <TextBlock x:Name="KpiTotal" FontSize="20" FontWeight="Bold"/>
+                </StackPanel>
+            </Border>
+            <Border Background="{StaticResource BgCardBrush}" CornerRadius="10" Padding="12" Margin="0,0,8,0" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="Güvenle Silinebilir" FontSize="11.5" Foreground="{StaticResource SafeBrush}"/>
+                    <TextBlock x:Name="KpiSafe" FontSize="20" FontWeight="Bold" Foreground="{StaticResource SafeBrush}"/>
+                </StackPanel>
+            </Border>
+            <Border Background="{StaticResource BgCardBrush}" CornerRadius="10" Padding="12" Margin="0,0,8,0" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="Kontrol Et" FontSize="11.5" Foreground="{StaticResource ModerateBrush}"/>
+                    <TextBlock x:Name="KpiModerate" FontSize="20" FontWeight="Bold" Foreground="{StaticResource ModerateBrush}"/>
+                </StackPanel>
+            </Border>
+            <Border Background="{StaticResource BgCardBrush}" CornerRadius="10" Padding="12" Margin="0,0,8,0" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="Dikkatli Ol" FontSize="11.5" Foreground="{StaticResource CautionBrush}"/>
+                    <TextBlock x:Name="KpiCaution" FontSize="20" FontWeight="Bold" Foreground="{StaticResource CautionBrush}"/>
+                </StackPanel>
+            </Border>
+            <Border Background="{StaticResource BgCardBrush}" CornerRadius="10" Padding="12" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="Toplam Boyut" FontSize="11.5" Foreground="{StaticResource TextSecondaryBrush}"/>
+                    <TextBlock x:Name="KpiSize" FontSize="20" FontWeight="Bold"/>
+                </StackPanel>
+            </Border>
+        </UniformGrid>
+
+        <!-- Quick selection buttons -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,0,0,10">
+            <Button Content="Sadece Güvenlileri Seç" Click="SelectSafe_Click" Margin="0,0,8,0"/>
+            <Button Content="Tümünü Seç" Click="SelectAll_Click" Margin="0,0,8,0"/>
+            <Button Content="Seçimi Temizle" Click="ClearSelection_Click"/>
+        </StackPanel>
+
+        <!-- Items DataGrid -->
+        <DataGrid x:Name="ItemsGrid" Grid.Row="3">
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Header="Seç" Width="48">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Durum" Width="135" IsReadOnly="True">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Background="{Binding Risk, Converter={StaticResource RiskToBrush}}" CornerRadius="10" Padding="8,3" HorizontalAlignment="Left">
+                                <TextBlock Text="{Binding Risk, Converter={StaticResource RiskToTr}}" Foreground="White" FontSize="11.5" FontWeight="SemiBold"/>
+                            </Border>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Güven" Binding="{Binding Confidence, StringFormat={}{0}%}" ElementStyle="{StaticResource GridCellTextStyle}" Width="65" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Tür" Binding="{Binding Category}" ElementStyle="{StaticResource GridCellTextStyle}" Width="105" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Konum" Binding="{Binding DisplayPath}" ElementStyle="{StaticResource GridCellTextStyle}" Width="2*" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Boyut" Binding="{Binding FormattedSize}" ElementStyle="{StaticResource GridCellTextStyle}" Width="80" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Açıklama" Binding="{Binding MatchReason}" ElementStyle="{StaticResource GridCellTextStyle}" Width="1.8*" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Kilitli Süreç" Binding="{Binding LockingSummary}" ElementStyle="{StaticResource GridCellTextStyle}" Width="115" IsReadOnly="True"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Footer options & Execute -->
+        <Border Grid.Row="4" Margin="0,12,0,0" Padding="12" Background="{StaticResource BgSurfaceBrush}" CornerRadius="10" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+            <DockPanel LastChildFill="False">
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
+                    <CheckBox x:Name="ChkQuarantine" Content="Geri alınabilir yedek al" IsChecked="True" Margin="0,0,12,0"/>
+                    <CheckBox x:Name="ChkKillProcesses" Content="Kilitleyen süreçleri kapat" IsChecked="False" Margin="0,0,12,0"/>
+                    <CheckBox x:Name="ChkReboot" Content="Kilitliyse açılışta sil" IsChecked="True" Margin="0,0,12,0"/>
+                    <CheckBox x:Name="ChkDryRun" Content="Önizleme" IsChecked="False"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                    <Button Content="Kapat" Click="Close_Click" Margin="0,0,8,0"/>
+                    <Button Content="Önerilen Çöpleri Güvenle Temizle" Style="{StaticResource SafeActionButton}" Click="CleanSafeRecommended_Click" Margin="0,0,8,0"/>
+                    <Button Content="Seçili Kalıntıları Temizle" Style="{StaticResource DangerButton}" Click="ExecuteCleanup_Click"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+    </Grid>
+</Window>

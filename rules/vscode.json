@@ -1,0 +1,17 @@
+{
+  "id": "vscode",
+  "name": "Visual Studio Code",
+  "publishers": ["Microsoft Corporation"],
+  "matchNames": ["Microsoft Visual Studio Code", "Visual Studio Code"],
+  "paths": [
+    "%LOCALAPPDATA%\\Programs\\Microsoft VS Code",
+    "%APPDATA%\\Code",
+    "%USERPROFILE%\\.vscode"
+  ],
+  "registryKeys": [
+    "HKCU\\Software\\Microsoft\\VSCode"
+  ],
+  "services": [],
+  "scheduledTasks": [],
+  "notes": "VS Code eklentileri (%USERPROFILE%\\.vscode) ve kullanıcı ayarları (%APPDATA%\\Code) kaldırma sonrası korunur."
+}

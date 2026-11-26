@@ -1,0 +1,16 @@
+{
+  "id": "spotify",
+  "name": "Spotify",
+  "publishers": ["Spotify AB"],
+  "matchNames": ["Spotify"],
+  "paths": [
+    "%APPDATA%\\Spotify",
+    "%LOCALAPPDATA%\\Spotify"
+  ],
+  "registryKeys": [
+    "HKCU\\Software\\Spotify"
+  ],
+  "services": [],
+  "scheduledTasks": [],
+  "notes": "Spotify çevrimdışı önbellek ve kullanıcı profilini AppData ve LocalAppData altında tutar."
+}
